@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talent Management Data Hub | Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f0f2f5;--white:#fff;--text:#1a1d23;--muted:#6b7280;--primary:#6366f1;--primary-light:#e0e7ff;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--border:#e5e7eb}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+.demo-banner{background:#1e293b;color:#e2e8f0;text-align:center;padding:.6rem;font-size:.8rem}
+.demo-banner a{color:#5eead4;margin-left:.5rem}
+
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{font-weight:700;font-size:1rem;display:flex;align-items:center;gap:.5rem}
+.nav-brand svg{width:24px;height:24px}
+.nav-tabs{display:flex;gap:0}
+.nav-tabs a{padding:1rem 1.25rem;font-size:.85rem;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;transition:all .2s}
+.nav-tabs a.active{color:var(--primary);border-color:var(--primary);font-weight:600}
+.nav-tabs a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-right select{padding:.4rem .8rem;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:.82rem}
+
+.dashboard{padding:1.5rem 2rem}
+.dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.dash-header h1{font-size:1.4rem}
+.dash-header .updated{font-size:.78rem;color:var(--muted)}
+.source-pills{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.source-pills .pill{font-size:.72rem;padding:.3rem .65rem;border-radius:6px;display:flex;align-items:center;gap:.35rem}
+.pill-green{background:#d1fae5;color:#065f46}
+.pill-blue{background:#dbeafe;color:#1e40af}
+.pill-purple{background:#e0e7ff;color:#3730a3}
+.pill-yellow{background:#fef3c7;color:#92400e}
+.pill-dot{width:6px;height:6px;border-radius:50%}
+
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+.kpi{background:var(--white);border-radius:12px;padding:1.25rem;border:1px solid var(--border)}
+.kpi .label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem}
+.kpi .value{font-size:1.8rem;font-weight:700;line-height:1.1}
+.kpi .change{font-size:.75rem;margin-top:.35rem;display:flex;align-items:center;gap:.25rem}
+.kpi .up{color:var(--success)}
+.kpi .down{color:var(--danger)}
+
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.chart-card{background:var(--white);border-radius:12px;padding:1.25rem;border:1px solid var(--border)}
+.chart-card h3{font-size:.9rem;font-weight:600;margin-bottom:.25rem}
+.chart-card .subtitle{font-size:.75rem;color:var(--muted);margin-bottom:1rem}
+
+.table-card{background:var(--white);border-radius:12px;padding:1.25rem;border:1px solid var(--border);margin-bottom:1.5rem}
+.table-card h3{font-size:.9rem;font-weight:600;margin-bottom:1rem}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:.6rem .75rem;border-bottom:2px solid var(--border);font-weight:600;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+td{padding:.6rem .75rem;border-bottom:1px solid var(--border)}
+tr:hover td{background:#f9fafb}
+.status{padding:.2rem .5rem;border-radius:4px;font-size:.72rem;font-weight:600}
+.status-active{background:#d1fae5;color:#065f46}
+.status-review{background:#fef3c7;color:#92400e}
+.status-pending{background:#e0e7ff;color:#3730a3}
+
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.pipe-card{background:var(--white);border-radius:12px;padding:1rem;border:1px solid var(--border);text-align:center;position:relative;overflow:hidden}
+.pipe-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pipe-card:nth-child(1)::before{background:var(--primary)}
+.pipe-card:nth-child(2)::before{background:var(--warning)}
+.pipe-card:nth-child(3)::before{background:var(--success)}
+.pipe-card:nth-child(4)::before{background:var(--danger)}
+.pipe-card .pipe-num{font-size:2rem;font-weight:700}
+.pipe-card .pipe-label{font-size:.75rem;color:var(--muted)}
+
+@media(max-width:768px){.charts-grid{grid-template-columns:1fr}.pipeline{grid-template-columns:1fr 1fr}.kpi-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="demo-banner">🔍 Interactive Demo — All data is simulated for demonstration purposes <a href="index.html">← Back to Portfolio</a></div>
+
+<nav>
+  <div class="nav-brand">
+    <svg viewBox="0 0 24 24" fill="#6366f1"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    TM Data Hub
+  </div>
+  <div class="nav-tabs">
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Headcount</a>
+    <a href="#">Programs</a>
+    <a href="#">Financial</a>
+    <a href="#">Data Sources</a>
+  </div>
+  <div class="nav-right">
+    <select><option>Q1 2026</option><option>Q4 2025</option><option>Q3 2025</option></select>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <div class="dash-header">
+    <div><h1>Talent Management Overview</h1><div class="updated">Last synced: Mar 26, 2026 at 9:15 AM PST · Auto-refresh every 4 hours</div></div>
+  </div>
+
+  <div class="source-pills">
+    <div class="pill pill-green"><span class="pill-dot" style="background:#065f46"></span>HRIS (Workday) — Synced</div>
+    <div class="pill pill-blue"><span class="pill-dot" style="background:#1e40af"></span>LMS Platform — Synced</div>
+    <div class="pill pill-purple"><span class="pill-dot" style="background:#3730a3"></span>EDU Platform — Synced</div>
+    <div class="pill pill-yellow"><span class="pill-dot" style="background:#92400e"></span>Financial (Airtable) — Synced</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">Total Headcount</div><div class="value">12,847</div><div class="change up">↑ 3.2% vs last quarter</div></div>
+    <div class="kpi"><div class="label">New Hires (Q1)</div><div class="value">487</div><div class="change up">↑ 12% vs Q4</div></div>
+    <div class="kpi"><div class="label">Program Completion Rate</div><div class="value">91%</div><div class="change up">↑ 4pts vs Q4</div></div>
+    <div class="kpi"><div class="label">Avg Days to Onboard</div><div class="value">14.2</div><div class="change down">↓ 2.1 days vs Q4</div></div>
+    <div class="kpi"><div class="label">TM Budget Utilized</div><div class="value">67%</div><div class="change">On track for Q1</div></div>
+    <div class="kpi"><div class="label">Active Programs</div><div class="value">18</div><div class="change up">↑ 3 new this quarter</div></div>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipe-card"><div class="pipe-num">487</div><div class="pipe-label">New Hires Started</div></div>
+    <div class="pipe-card"><div class="pipe-num">412</div><div class="pipe-label">Onboarding In Progress</div></div>
+    <div class="pipe-card"><div class="pipe-num">398</div><div class="pipe-label">Onboarding Complete</div></div>
+    <div class="pipe-card"><div class="pipe-num">14</div><div class="pipe-label">At Risk / Delayed</div></div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Headcount Trend by Department</h3>
+      <div class="subtitle">Rolling 6 quarters · Source: HRIS (Workday)</div>
+      <canvas id="headcountChart" height="120"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Program Participation</h3>
+      <div class="subtitle">Q1 2026 · Source: LMS + EDU</div>
+      <canvas id="programChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Budget Allocation vs Spend</h3>
+      <div class="subtitle">Q1 2026 · Source: Airtable Financial Model</div>
+      <canvas id="budgetChart" height="120"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Onboarding NPS</h3>
+      <div class="subtitle">Q1 2026 · Source: Survey Platform</div>
+      <canvas id="npsChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <h3>Active Programs — Status Tracker</h3>
+    <table>
+      <thead><tr><th>Program</th><th>Owner</th><th>Status</th><th>Completion</th><th>Participants</th><th>Budget</th></tr></thead>
+      <tbody>
+        <tr><td><strong>New Employee College Q1</strong></td><td>H. Cohee</td><td><span class="status status-active">Active</span></td><td>92%</td><td>487</td><td>$285K / $310K</td></tr>
+        <tr><td><strong>Feedback Workshop Series</strong></td><td>H. Cohee</td><td><span class="status status-active">Active</span></td><td>78%</td><td>247</td><td>$42K / $55K</td></tr>
+        <tr><td><strong>Leadership Foundations</strong></td><td>R. Simmons</td><td><span class="status status-active">Active</span></td><td>65%</td><td>128</td><td>$180K / $200K</td></tr>
+        <tr><td><strong>Technical Skills Bootcamp</strong></td><td>J. Martinez</td><td><span class="status status-review">In Review</span></td><td>45%</td><td>89</td><td>$95K / $120K</td></tr>
+        <tr><td><strong>Manager Development Track</strong></td><td>A. Williams</td><td><span class="status status-pending">Planning</span></td><td>15%</td><td>—</td><td>$0 / $150K</td></tr>
+        <tr><td><strong>Self-Guided Learning Toolkit</strong></td><td>H. Cohee</td><td><span class="status status-review">In Review</span></td><td>70%</td><td>312</td><td>$18K / $25K</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const colors={primary:'#6366f1',purple:'#a78bfa',teal:'#14b8a6',orange:'#f97316',pink:'#ec4899',blue:'#3b82f6'};
+
+new Chart(document.getElementById('headcountChart'),{type:'line',data:{
+  labels:['Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026'],
+  datasets:[
+    {label:'Engineering',data:[4200,4350,4500,4680,4800,4950],borderColor:colors.primary,backgroundColor:'rgba(99,102,241,.1)',fill:true,tension:.3},
+    {label:'Product',data:[1800,1850,1920,2000,2050,2100],borderColor:colors.teal,backgroundColor:'rgba(20,184,166,.1)',fill:true,tension:.3},
+    {label:'Content',data:[2800,2900,3000,3100,3150,3200],borderColor:colors.orange,backgroundColor:'rgba(249,115,22,.1)',fill:true,tension:.3},
+    {label:'Corporate',data:[2200,2250,2300,2350,2400,2450],borderColor:colors.pink,backgroundColor:'rgba(236,72,153,.1)',fill:true,tension:.3},
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:false,grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}}});
+
+new Chart(document.getElementById('programChart'),{type:'doughnut',data:{
+  labels:['Onboarding','Feedback','Leadership','Technical','Self-Guided'],
+  datasets:[{data:[487,247,128,89,312],backgroundColor:[colors.primary,colors.teal,colors.orange,colors.pink,colors.purple],borderWidth:0}]
+},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},cutout:'60%'}});
+
+new Chart(document.getElementById('budgetChart'),{type:'bar',data:{
+  labels:['NEC','Feedback','Leadership','Tech Skills','Manager Dev','Self-Guided'],
+  datasets:[
+    {label:'Allocated',data:[310,55,200,120,150,25],backgroundColor:'rgba(99,102,241,.2)',borderColor:colors.primary,borderWidth:1},
+    {label:'Spent',data:[285,42,180,95,0,18],backgroundColor:'rgba(99,102,241,.7)',borderColor:colors.primary,borderWidth:0}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'$'+v+'K'},grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}}});
+
+new Chart(document.getElementById('npsChart'),{type:'doughnut',data:{
+  labels:['Promoters (9-10)','Passives (7-8)','Detractors (0-6)'],
+  datasets:[{data:[68,24,8],backgroundColor:[colors.teal,'#fbbf24','#f87171'],borderWidth:0}]
+},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:11}}}},cutout:'65%'}});
+</script>
+</body>
+</html>

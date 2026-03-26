@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Tool Rollout | Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f8fafc;--white:#fff;--text:#0f172a;--muted:#64748b;--primary:#0ea5e9;--primary-light:#e0f2fe;--green:#22c55e;--green-light:#dcfce7;--yellow:#eab308;--yellow-light:#fef9c3;--red:#ef4444;--border:#e2e8f0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+.demo-banner{background:#0c4a6e;color:#e0f2fe;text-align:center;padding:.6rem;font-size:.8rem}
+.demo-banner a{color:#7dd3fc;margin-left:.5rem}
+
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-brand{font-weight:700;font-size:1rem;display:flex;align-items:center;gap:.5rem}
+.nav-tabs{display:flex;gap:0}
+.nav-tabs a{padding:1rem 1.25rem;font-size:.85rem;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;transition:all .2s;cursor:pointer}
+.nav-tabs a.active{color:var(--primary);border-color:var(--primary);font-weight:600}
+.nav-tabs a:hover{color:var(--text)}
+
+.page{padding:2rem}
+.page-header{margin-bottom:2rem}
+.page-header h1{font-size:1.4rem;margin-bottom:.25rem}
+.page-header p{font-size:.88rem;color:var(--muted)}
+
+.phase-timeline{display:flex;gap:0;margin-bottom:2rem;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.phase{flex:1;padding:1rem;text-align:center;position:relative;cursor:pointer;transition:all .2s}
+.phase::after{content:'';position:absolute;right:0;top:20%;height:60%;width:1px;background:var(--border)}
+.phase:last-child::after{display:none}
+.phase:hover{background:#f0f9ff}
+.phase.active{background:var(--primary-light)}
+.phase.complete{background:var(--green-light)}
+.phase .phase-num{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.phase .phase-name{font-size:.88rem;font-weight:600;margin:.25rem 0}
+.phase .phase-status{font-size:.72rem;padding:.2rem .5rem;border-radius:4px;display:inline-block}
+.phase.complete .phase-status{background:var(--green-light);color:#166534}
+.phase.active .phase-status{background:var(--primary-light);color:#0369a1}
+.phase .phase-status.upcoming{background:#f1f5f9;color:var(--muted)}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.metric{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.metric .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem}
+.metric .value{font-size:1.8rem;font-weight:700}
+.metric .bar{height:4px;background:var(--border);border-radius:4px;margin-top:.5rem;overflow:hidden}
+.metric .bar-fill{height:100%;border-radius:4px;transition:width 1s}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.card h3{font-size:.95rem;font-weight:600;margin-bottom:.25rem}
+.card .card-sub{font-size:.78rem;color:var(--muted);margin-bottom:1rem}
+
+.team-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.team-table th{text-align:left;padding:.5rem .6rem;border-bottom:2px solid var(--border);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.team-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border)}
+.adoption-bar{display:flex;align-items:center;gap:.5rem}
+.adoption-track{width:80px;height:6px;background:var(--border);border-radius:6px;overflow:hidden}
+.adoption-fill{height:100%;border-radius:6px}
+
+.playbook-list{list-style:none}
+.playbook-list li{padding:.75rem;border:1px solid var(--border);border-radius:8px;margin-bottom:.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.85rem;transition:all .2s;cursor:pointer}
+.playbook-list li:hover{border-color:var(--primary);background:#f0f9ff}
+.playbook-list .type{font-size:.7rem;padding:.2rem .5rem;border-radius:4px;background:var(--primary-light);color:#0369a1}
+
+.risk-list{list-style:none}
+.risk-item{padding:.75rem;border-radius:8px;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:flex-start;font-size:.85rem}
+.risk-item.high{background:#fef2f2;border-left:3px solid var(--red)}
+.risk-item.med{background:var(--yellow-light);border-left:3px solid var(--yellow)}
+.risk-item.low{background:var(--green-light);border-left:3px solid var(--green)}
+.risk-label{font-size:.7rem;font-weight:600;padding:.15rem .4rem;border-radius:3px;flex-shrink:0}
+.risk-item.high .risk-label{background:#fecaca;color:#991b1b}
+.risk-item.med .risk-label{background:#fde68a;color:#92400e}
+.risk-item.low .risk-label{background:#bbf7d0;color:#166534}
+
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}.phase-timeline{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="demo-banner">🔍 Interactive Demo — Change management dashboard for enterprise tool rollout <a href="index.html">← Back to Portfolio</a></div>
+
+<nav>
+  <div class="nav-brand">🚀 Rollout Command Center</div>
+  <div class="nav-tabs">
+    <a class="active">Dashboard</a>
+    <a>Teams</a>
+    <a>Playbooks</a>
+    <a>Training</a>
+    <a>Governance</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Project Management Tool Rollout — Adoption Tracker</h1>
+    <p>Enterprise-wide implementation across Talent Management teams · Rollout Lead: Helena Cohee</p>
+  </div>
+
+  <div class="phase-timeline">
+    <div class="phase complete" onclick="showPhase(1)">
+      <div class="phase-num">Phase 1</div>
+      <div class="phase-name">Discovery & Audit</div>
+      <div class="phase-status">✓ Complete</div>
+    </div>
+    <div class="phase complete" onclick="showPhase(2)">
+      <div class="phase-num">Phase 2</div>
+      <div class="phase-name">Pilot (2 Teams)</div>
+      <div class="phase-status">✓ Complete</div>
+    </div>
+    <div class="phase active" onclick="showPhase(3)">
+      <div class="phase-num">Phase 3</div>
+      <div class="phase-name">Full Rollout</div>
+      <div class="phase-status">In Progress</div>
+    </div>
+    <div class="phase" onclick="showPhase(4)">
+      <div class="phase-num">Phase 4</div>
+      <div class="phase-name">Optimization</div>
+      <div class="phase-status upcoming">Upcoming</div>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="label">Overall Adoption</div>
+      <div class="value" style="color:var(--primary)">78%</div>
+      <div class="bar"><div class="bar-fill" style="width:78%;background:var(--primary)"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Teams Onboarded</div>
+      <div class="value">7 / 9</div>
+      <div class="bar"><div class="bar-fill" style="width:78%;background:var(--green)"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Training Completion</div>
+      <div class="value">85%</div>
+      <div class="bar"><div class="bar-fill" style="width:85%;background:var(--green)"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Active Weekly Users</div>
+      <div class="value">142</div>
+      <div class="bar"><div class="bar-fill" style="width:71%;background:var(--yellow)"></div></div>
+    </div>
+    <div class="metric">
+      <div class="label">Governance Docs Created</div>
+      <div class="value">12</div>
+      <div class="bar"><div class="bar-fill" style="width:100%;background:var(--green)"></div></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Adoption by Team</h3>
+      <div class="card-sub">Weekly active usage rate per team</div>
+      <table class="team-table">
+        <thead><tr><th>Team</th><th>Members</th><th>Adoption</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Talent Operations</strong></td><td>18</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:95%;background:var(--green)"></div></div>95%</div></td><td style="color:var(--green)">Champion</td></tr>
+          <tr><td><strong>Learning & Development</strong></td><td>12</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:90%;background:var(--green)"></div></div>90%</div></td><td style="color:var(--green)">Champion</td></tr>
+          <tr><td><strong>New Hire Experience</strong></td><td>22</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:85%;background:var(--green)"></div></div>85%</div></td><td style="color:var(--green)">On Track</td></tr>
+          <tr><td><strong>HRBPs — West</strong></td><td>15</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:78%;background:var(--primary)"></div></div>78%</div></td><td style="color:var(--primary)">On Track</td></tr>
+          <tr><td><strong>HRBPs — East</strong></td><td>14</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:72%;background:var(--primary)"></div></div>72%</div></td><td style="color:var(--primary)">On Track</td></tr>
+          <tr><td><strong>Compensation</strong></td><td>8</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:65%;background:var(--yellow)"></div></div>65%</div></td><td style="color:var(--yellow)">Needs Push</td></tr>
+          <tr><td><strong>Analytics</strong></td><td>6</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:60%;background:var(--yellow)"></div></div>60%</div></td><td style="color:var(--yellow)">Needs Push</td></tr>
+          <tr><td style="color:var(--muted)">Benefits</td><td>10</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:0%;background:var(--border)"></div></div>—</div></td><td style="color:var(--muted)">Phase 4</td></tr>
+          <tr><td style="color:var(--muted)">Employee Relations</td><td>9</td><td><div class="adoption-bar"><div class="adoption-track"><div class="adoption-fill" style="width:0%;background:var(--border)"></div></div>—</div></td><td style="color:var(--muted)">Phase 4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Adoption Trend</h3>
+      <div class="card-sub">Weekly active users over 12 weeks</div>
+      <canvas id="adoptionChart" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Playbooks & Governance Docs</h3>
+      <div class="card-sub">Created as part of rollout — now team standards</div>
+      <ul class="playbook-list">
+        <li><span>Getting Started Guide (New Users)</span><span class="type">Onboarding</span></li>
+        <li><span>Project Naming Conventions</span><span class="type">Governance</span></li>
+        <li><span>Workspace Structure & Permissions</span><span class="type">Governance</span></li>
+        <li><span>Template Library — TM Programs</span><span class="type">Template</span></li>
+        <li><span>Cross-Regional Visibility Setup</span><span class="type">Playbook</span></li>
+        <li><span>Status Reporting Workflow</span><span class="type">Playbook</span></li>
+        <li><span>Escalation & Blocker Protocol</span><span class="type">Governance</span></li>
+        <li><span>Tool Migration Checklist</span><span class="type">Playbook</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Risk Register</h3>
+      <div class="card-sub">Active risks and mitigations</div>
+      <div class="risk-list">
+        <div class="risk-item med"><span class="risk-label">MED</span><div><strong>Comp & Analytics teams lagging</strong><br><span style="font-size:.78rem;color:var(--muted)">Mitigation: Scheduling dedicated 1:1 onboarding sessions with team leads. Assigned adoption champions within each team.</span></div></div>
+        <div class="risk-item low"><span class="risk-label">LOW</span><div><strong>Template overload reported</strong><br><span style="font-size:.78rem;color:var(--muted)">Mitigation: Consolidated from 18 templates to 8 core templates. Created "start here" guide for template selection.</span></div></div>
+        <div class="risk-item low"><span class="risk-label">LOW</span><div><strong>Integration with existing calendar</strong><br><span style="font-size:.78rem;color:var(--muted)">Mitigation: Enabled two-way calendar sync. Created how-to doc distributed to all users.</span></div></div>
+        <div class="risk-item high" style="opacity:.4"><span class="risk-label">CLOSED</span><div><strong style="text-decoration:line-through">Executive buy-in for budget</strong><br><span style="font-size:.78rem;color:var(--muted)">Resolved: VP approved tool license budget after pilot results presentation showing 40% productivity gain.</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+new Chart(document.getElementById('adoptionChart'),{type:'line',data:{
+  labels:['Wk1','Wk2','Wk3','Wk4','Wk5','Wk6','Wk7','Wk8','Wk9','Wk10','Wk11','Wk12'],
+  datasets:[
+    {label:'Active Users',data:[12,28,45,62,78,88,95,105,118,125,135,142],borderColor:'#0ea5e9',backgroundColor:'rgba(14,165,233,.1)',fill:true,tension:.3,pointRadius:3},
+    {label:'Target',data:[15,30,50,70,85,95,105,115,125,135,145,155],borderColor:'#94a3b8',borderDash:[5,5],fill:false,tension:.3,pointRadius:0}
+  ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}}});
+
+function showPhase(n){
+  const msgs={1:'Phase 1 (Complete): Audited 14 existing tools and workflows across 9 teams. Identified fragmentation, duplicate tracking, and visibility gaps.',2:'Phase 2 (Complete): Piloted with Talent Ops and L&D teams for 6 weeks. Measured 40% productivity increase. Refined governance docs based on user feedback.',3:'Phase 3 (In Progress): Rolling out to remaining 7 teams. 78% overall adoption achieved. Focus on lagging teams and template optimization.',4:'Phase 4 (Upcoming): Benefits and Employee Relations teams. Advanced workflow automation. Integration with HRIS and reporting dashboards.'};
+  alert('Demo: '+msgs[n]);
+}
+</script>
+</body>
+</html>
