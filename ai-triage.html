@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Intake & Triage System | Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1117;--surface:#1a1d27;--card:#222632;--border:#2e3340;--text:#e4e7ec;--muted:#8891a4;--green:#22c55e;--blue:#3b82f6;--purple:#8b5cf6;--yellow:#eab308;--red:#ef4444;--cyan:#06b6d4}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.demo-banner{background:#5b21b6;color:#e2e8f0;text-align:center;padding:.6rem;font-size:.8rem}
+.demo-banner a{color:#c4b5fd;margin-left:.5rem}
+.layout{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 36px)}
+
+.left{padding:2.5rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)}
+.left h1{font-size:1.6rem;font-weight:700;margin-bottom:.5rem}
+.left .sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem}
+
+.form-group{margin-bottom:1.25rem}
+.form-group label{font-size:.78rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.4rem}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:.7rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:.9rem;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--purple)}
+.form-group textarea{height:100px;resize:none}
+.form-group select{cursor:pointer}
+.form-group select option{background:var(--surface)}
+
+.submit-btn{width:100%;padding:.75rem;background:var(--purple);color:white;border:none;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.submit-btn:hover{background:#7c3aed;transform:translateY(-1px)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+
+.right{padding:2.5rem;overflow-y:auto}
+.right h2{font-size:1.1rem;margin-bottom:.5rem}
+.right .sub{color:var(--muted);font-size:.82rem;margin-bottom:1.5rem}
+
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;animation:fadeIn .4s ease}
+.result-card h4{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+
+.classification{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.tag{padding:.3rem .7rem;border-radius:6px;font-size:.78rem;font-weight:600}
+.tag-purple{background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.25)}
+.tag-blue{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.tag-green{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.tag-yellow{background:rgba(234,179,8,.15);color:#facc15;border:1px solid rgba(234,179,8,.25)}
+.tag-red{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.tag-cyan{background:rgba(6,182,212,.15);color:#22d3ee;border:1px solid rgba(6,182,212,.25)}
+
+.route-box{background:var(--card);border-radius:8px;padding:1rem;font-size:.85rem;line-height:1.6}
+.route-box strong{color:var(--cyan)}
+
+.confidence{display:flex;align-items:center;gap:.5rem;margin-top:.75rem}
+.conf-bar{flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden}
+.conf-fill{height:100%;border-radius:6px;transition:width 1s ease}
+.conf-label{font-size:.78rem;color:var(--muted);min-width:40px;text-align:right}
+
+.log{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:var(--card);border-radius:8px;padding:1rem;color:var(--muted);line-height:1.8;max-height:200px;overflow-y:auto;margin-top:1rem}
+.log .ts{color:var(--purple)}
+.log .action{color:var(--green)}
+.log .warn{color:var(--yellow)}
+
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
+.empty-state svg{margin-bottom:1rem;opacity:.4}
+.empty-state p{font-size:.9rem}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.processing{animation:pulse 1s infinite}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}}
+</style>
+</head>
+<body>
+<div class="demo-banner">🔍 Interactive Demo — Submit a request to see AI classification in action <a href="index.html">← Back to Portfolio</a></div>
+
+<div class="layout">
+  <div class="left">
+    <h1>Employee Support Request</h1>
+    <p class="sub">Submit your request below. Our AI-powered system will automatically classify, prioritize, and route it to the right team.</p>
+
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" id="name" value="Alex Thompson" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <select id="dept">
+        <option>Engineering</option><option>Product</option><option>Content</option><option>Marketing</option><option>Finance</option><option>HR</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Request Type</label>
+      <select id="type" onchange="updateTemplate()">
+        <option value="">Select a category...</option>
+        <option value="access">Systems Access</option>
+        <option value="learning">Learning & Development</option>
+        <option value="feedback">Feedback Program</option>
+        <option value="onboarding">Onboarding Issue</option>
+        <option value="policy">Policy Question</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Describe Your Request</label>
+      <textarea id="desc" placeholder="Tell us what you need help with..."></textarea>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="processRequest()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Submit & Run AI Classification
+    </button>
+  </div>
+
+  <div class="right">
+    <h2>AI Triage Results</h2>
+    <p class="sub">Real-time classification, priority scoring, and automated routing</p>
+    <div id="results">
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="#8891a4"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <p>Submit a request to see the AI triage system in action.<br>The system will classify, prioritize, and route automatically.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const templates={
+  access:"I need access to the internal analytics dashboard. My manager approved it last week but I still can't log in. Getting an error that says 'insufficient permissions'. This is blocking my sprint work.",
+  learning:"I'm interested in the upcoming feedback workshop series. Can I attend the one on April 15th? Also wondering if there's a self-paced version available for my team members in different time zones.",
+  feedback:"I had my mid-year review but I'm confused about the rating scale. My manager mentioned I should use the self-guided toolkit but I can't find it. Can someone point me in the right direction?",
+  onboarding:"I started two weeks ago and still haven't received my laptop or badge. IT says they never got the ticket. My buddy hasn't reached out either. Feeling a bit lost.",
+  policy:"Quick question — what's the policy on using AI tools like ChatGPT for work projects? I want to use it for drafting communications but not sure if it's approved.",
+  other:"Our team is growing fast and we need a better way to track projects across pods. We've been using spreadsheets but it's getting messy. Is there an approved tool we should be using?"
+};
+
+const classifications={
+  access:{category:"Systems & Access",priority:"High",priorityColor:"tag-red",urgency:85,team:"IT Service Desk",sla:"4 hours",tags:["Permissions","Dashboard","Sprint Blocker"],action:"Auto-created IT ticket #TK-4892. Escalated due to sprint-blocking status. Manager approval verified in system."},
+  learning:{category:"Learning & Development",priority:"Medium",priorityColor:"tag-yellow",urgency:45,team:"Talent Development (L&D)",sla:"48 hours",tags:["Workshop","Registration","Async Learning"],action:"Routed to L&D coordinator. Auto-sent workshop catalog link and self-paced options guide. Registration link queued."},
+  feedback:{category:"Performance & Feedback",priority:"Medium",priorityColor:"tag-yellow",urgency:55,team:"Talent Management",sla:"24 hours",tags:["Review Process","Self-Guided Toolkit","Rating Scale"],action:"Auto-sent Self-Guided Toolkit link. Flagged for TM coordinator follow-up on rating scale clarification."},
+  onboarding:{category:"Onboarding & New Hire",priority:"Critical",priorityColor:"tag-red",urgency:95,team:"New Employee Experience",sla:"2 hours",tags:["Equipment","Day 1 Setup","Buddy Program","Escalation"],action:"ESCALATED: Multi-system failure detected. Auto-created IT equipment ticket. Pinged buddy program coordinator. Flagged to NEC program owner for immediate follow-up."},
+  policy:{category:"Policy & Compliance",priority:"Low",priorityColor:"tag-green",urgency:25,team:"People Policy",sla:"72 hours",tags:["AI Usage","Compliance","Guidelines"],action:"Auto-sent current AI usage policy document (v2.3). Queued for policy team review if follow-up needed."},
+  other:{category:"Operations & Tooling",priority:"Medium",priorityColor:"tag-yellow",urgency:50,team:"Technology Experience",sla:"48 hours",tags:["Project Management","Tool Request","Team Scaling"],action:"Routed to Tech Experience team. Auto-sent approved tools catalog. Flagged for potential Asana workspace provisioning."}
+};
+
+function updateTemplate(){
+  const type=document.getElementById('type').value;
+  if(templates[type])document.getElementById('desc').value=templates[type];
+}
+
+function processRequest(){
+  const type=document.getElementById('type').value||'other';
+  const name=document.getElementById('name').value;
+  const dept=document.getElementById('dept').value;
+  const desc=document.getElementById('desc').value;
+  const btn=document.getElementById('submitBtn');
+  const c=classifications[type];
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="processing">⚡ Processing with AI...</span>';
+
+  document.getElementById('results').innerHTML='<div class="result-card processing" style="text-align:center;padding:2rem"><p style="color:var(--purple)">Analyzing request content...</p></div>';
+
+  setTimeout(()=>{
+    document.getElementById('results').innerHTML=`
+      <div class="result-card">
+        <h4>Classification</h4>
+        <div class="classification">
+          <span class="tag tag-purple">${c.category}</span>
+          <span class="tag ${c.priorityColor}">Priority: ${c.priority}</span>
+          <span class="tag tag-cyan">SLA: ${c.sla}</span>
+        </div>
+        <div class="classification">${c.tags.map(t=>`<span class="tag tag-blue">${t}</span>`).join('')}</div>
+      </div>
+
+      <div class="result-card">
+        <h4>Urgency Score</h4>
+        <div class="confidence">
+          <div class="conf-bar"><div class="conf-fill" style="width:${c.urgency}%;background:${c.urgency>80?'#ef4444':c.urgency>50?'#eab308':'#22c55e'}"></div></div>
+          <span class="conf-label">${c.urgency}/100</span>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <h4>AI Confidence</h4>
+        <div class="confidence">
+          <div class="conf-bar"><div class="conf-fill" style="width:92%;background:var(--purple)"></div></div>
+          <span class="conf-label">92%</span>
+        </div>
+      </div>
+
+      <div class="result-card">
+        <h4>Routing Decision</h4>
+        <div class="route-box">
+          <strong>→ ${c.team}</strong><br><br>
+          ${c.action}
+        </div>
+      </div>
+
+      <div class="result-card">
+        <h4>Processing Log</h4>
+        <div class="log">
+          <div><span class="ts">[09:15:42]</span> <span class="action">REQUEST_RECEIVED</span> from ${name} (${dept})</div>
+          <div><span class="ts">[09:15:42]</span> <span class="action">NLP_ANALYSIS</span> extracting keywords and intent...</div>
+          <div><span class="ts">[09:15:43]</span> <span class="action">CLASSIFIED</span> → ${c.category} (confidence: 92%)</div>
+          <div><span class="ts">[09:15:43]</span> <span class="action">PRIORITY_SCORED</span> → ${c.priority} (urgency: ${c.urgency}/100)</div>
+          ${c.urgency>80?`<div><span class="ts">[09:15:43]</span> <span class="warn">ESCALATION_TRIGGERED</span> urgency threshold exceeded</div>`:''}
+          <div><span class="ts">[09:15:44]</span> <span class="action">ROUTED</span> → ${c.team}</div>
+          <div><span class="ts">[09:15:44]</span> <span class="action">AUTO_RESPONSE</span> sent to ${name}</div>
+          <div><span class="ts">[09:15:44]</span> <span class="action">SLA_TIMER</span> started (${c.sla})</div>
+          <div><span class="ts">[09:15:45]</span> <span class="action">COMPLETE</span> request processed in 2.8s</div>
+        </div>
+      </div>
+    `;
+
+    btn.disabled=false;
+    btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Submit Another Request';
+  },2000);
+}
+</script>
+</body>
+</html>

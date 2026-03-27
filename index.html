@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helena Cohee | Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c0f14;--surface:#14181f;--card:#1a1f28;--border:#262c38;--text:#e8eaed;--muted:#8b95a5;--accent:#5eead4;--accent2:#a78bfa;--warm:#f0abfc}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+
+.grain{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:9999}
+
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:4rem 8%;position:relative}
+.hero::before{content:'';position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(94,234,212,.06) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-10%;left:-5%;width:400px;height:400px;background:radial-gradient(circle,rgba(167,139,250,.05) 0%,transparent 70%);pointer-events:none}
+
+.tag{display:inline-block;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(94,234,212,.25);padding:.35rem .85rem;border-radius:100px;margin-bottom:2rem;animation:fadeIn .8s ease}
+.hero h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(2.8rem,6vw,5rem);line-height:1.1;margin-bottom:1.5rem;animation:fadeIn 1s ease}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:620px;margin-bottom:2.5rem;animation:fadeIn 1.2s ease}
+.hero-links{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeIn 1.4s ease}
+.hero-links a{font-size:.85rem;padding:.65rem 1.4rem;border-radius:8px;transition:all .3s}
+.hero-links .primary{background:var(--accent);color:var(--bg);font-weight:600}
+.hero-links .primary:hover{background:#2dd4bf;transform:translateY(-2px)}
+.hero-links .secondary{border:1px solid var(--border);color:var(--muted)}
+.hero-links .secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+.section{padding:5rem 8%}
+.section-label{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem}
+.section h2{font-family:'Fraunces',serif;font-size:2.2rem;font-weight:600;margin-bottom:1rem}
+.section h2+p{color:var(--muted);max-width:600px;margin-bottom:3rem}
+
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:1.5rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .4s;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-6px);box-shadow:0 20px 60px rgba(94,234,212,.06)}
+.card-img{height:200px;overflow:hidden;position:relative}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .card-img img{transform:scale(1.05)}
+.card-body{padding:1.5rem}
+.card-body h3{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:600;margin-bottom:.5rem}
+.card-body p{font-size:.9rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6}
+.card-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem}
+.card-tags span{font-size:.7rem;padding:.25rem .6rem;border-radius:6px;background:rgba(94,234,212,.08);color:var(--accent);border:1px solid rgba(94,234,212,.15)}
+.card-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:500;color:var(--accent);transition:gap .3s}
+.card-link:hover{gap:.7rem}
+
+.impact{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-top:3rem}
+.impact-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center}
+.impact-card .num{font-family:'Fraunces',serif;font-size:2.5rem;font-weight:700;color:var(--accent);line-height:1}
+.impact-card .label{font-size:.85rem;color:var(--muted);margin-top:.5rem}
+
+.about{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.about-text p{color:var(--muted);margin-bottom:1rem;font-size:.95rem}
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.skill-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;font-size:.85rem}
+.skill-item strong{color:var(--accent);display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem}
+
+footer{padding:3rem 8%;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+footer p{font-size:.85rem;color:var(--muted)}
+footer a{color:var(--accent);font-size:.85rem}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:768px){
+  .hero{padding:3rem 5%}
+  .section{padding:3rem 5%}
+  .about{grid-template-columns:1fr}
+  .projects{grid-template-columns:1fr}
+  footer{padding:2rem 5%}
+}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<section class="hero">
+  <span class="tag">Portfolio & Live Demos</span>
+  <h1>I build the systems<br>that <span>scale operations</span>.</h1>
+  <p>Senior Program Manager who designs, builds, and ships production tools — from enterprise onboarding programs to AI-powered automation and real-time data infrastructure. No engineering team required.</p>
+  <div class="hero-links">
+    <a href="#projects" class="primary">View Projects ↓</a>
+    <a href="https://linkedin.com/in/helenabcohee" target="_blank" class="secondary">LinkedIn →</a>
+    <a href="https://github.com/HelenaCohee" target="_blank" class="secondary">GitHub →</a>
+  </div>
+</section>
+
+<section class="section" id="impact">
+  <span class="section-label">By the Numbers</span>
+  <h2>Measurable Impact</h2>
+  <p>Results from enterprise program management, systems architecture, and AI-enabled operations at a Fortune 500 entertainment company.</p>
+  <div class="impact">
+    <div class="impact-card"><div class="num">$1M+</div><div class="label">Quarterly budget managed with 100% compliance</div></div>
+    <div class="impact-card"><div class="num">550</div><div class="label">New hires onboarded per quarter through flagship program</div></div>
+    <div class="impact-card"><div class="num">60 hrs</div><div class="label">Eliminated per quarter through data infrastructure automation</div></div>
+    <div class="impact-card"><div class="num">30%</div><div class="label">Reduction in manual effort via AI-powered workflow design</div></div>
+    <div class="impact-card"><div class="num">3</div><div class="label">Business units served by self-service tools & programs</div></div>
+    <div class="impact-card"><div class="num">20%</div><div class="label">Cost savings on six-figure vendor contracts</div></div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <span class="section-label">Projects & Demos</span>
+  <h2>What I've Built</h2>
+  <p>Each project includes a live interactive demo. No real company data is used — all demos use sample content to show the UX and functionality.</p>
+
+  <div class="projects">
+    <div class="card">
+      <div class="card-img" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);display:flex;align-items:center;justify-content:center">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="10" y="15" width="60" height="50" rx="4" stroke="#5eead4" stroke-width="2"/><path d="M10 28h60" stroke="#5eead4" stroke-width="2"/><circle cx="18" cy="22" r="2" fill="#5eead4"/><circle cx="25" cy="22" r="2" fill="#5eead4"/><circle cx="32" cy="22" r="2" fill="#5eead4"/><rect x="20" y="36" width="40" height="6" rx="2" fill="rgba(94,234,212,.2)"/><rect x="20" y="48" width="25" height="6" rx="2" fill="rgba(94,234,212,.2)"/></svg>
+      </div>
+      <div class="card-body">
+        <h3>Workshop Registration Portal</h3>
+        <p>Full-stack web application enabling self-service workshop registration with calendar integration, attendance tracking, and cross-business-unit deployment.</p>
+        <div class="card-tags">
+          <span>Node.js</span><span>Express</span><span>MongoDB</span><span>Google Calendar API</span><span>Render</span>
+        </div>
+        <a href="feedback-portal.html" class="card-link">Launch Demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);display:flex;align-items:center;justify-content:center">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="8" y="20" width="64" height="40" rx="4" stroke="#a78bfa" stroke-width="2"/><path d="M20 50V35" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/><path d="M32 50V30" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/><path d="M44 50V38" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/><path d="M56 50V28" stroke="#a78bfa" stroke-width="4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="card-body">
+        <h3>Talent Management Data Hub</h3>
+        <p>Multi-tier data pipeline and real-time dashboard connecting HR, headcount, financial, and program performance data into a single source of truth.</p>
+        <div class="card-tags">
+          <span>Airtable</span><span>Looker Studio</span><span>Tableau</span><span>ETL Design</span><span>Data Modeling</span>
+        </div>
+        <a href="data-hub.html" class="card-link">Launch Demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img" style="background:linear-gradient(135deg,#1b1b2f,#162447,#1f4068);display:flex;align-items:center;justify-content:center">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M40 15l20 12v22L40 61 20 49V27L40 15z" stroke="#f0abfc" stroke-width="2"/><circle cx="40" cy="38" r="8" stroke="#f0abfc" stroke-width="2"/><path d="M36 38h8M40 34v8" stroke="#f0abfc" stroke-width="1.5"/></svg>
+      </div>
+      <div class="card-body">
+        <h3>AI-Powered Intake & Triage</h3>
+        <p>Automated employee support system that routes, categorizes, and prioritizes requests using AI classification, reducing manual triage effort by 30%.</p>
+        <div class="card-tags">
+          <span>Google Apps Script</span><span>AI Integration</span><span>Automation</span><span>Process Design</span>
+        </div>
+        <a href="ai-triage.html" class="card-link">Launch Demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img" style="background:linear-gradient(135deg,#0d1117,#161b22,#21262d);display:flex;align-items:center;justify-content:center">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="15" y="12" width="50" height="56" rx="3" stroke="#5eead4" stroke-width="2"/><path d="M25 25h30M25 33h20M25 41h25" stroke="#5eead4" stroke-width="1.5" stroke-linecap="round"/><rect x="25" y="50" width="12" height="8" rx="2" fill="rgba(94,234,212,.2)"/><rect x="41" y="50" width="12" height="8" rx="2" fill="rgba(94,234,212,.2)"/></svg>
+      </div>
+      <div class="card-body">
+        <h3>Self-Guided Learning Toolkit</h3>
+        <p>Digital learning experience that transforms a 128-page internal playbook into modular, self-paced content with progress tracking and search.</p>
+        <div class="card-tags">
+          <span>Content Design</span><span>Adult Learning</span><span>Google Sites</span><span>UX Architecture</span>
+        </div>
+        <a href="learning-toolkit.html" class="card-link">Launch Demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img" style="background:linear-gradient(135deg,#1a1423,#2d1b3d,#1f1145);display:flex;align-items:center;justify-content:center">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none"><rect x="10" y="20" width="25" height="18" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="45" y="20" width="25" height="18" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="10" y="46" width="25" height="18" rx="3" stroke="#a78bfa" stroke-width="2"/><rect x="45" y="46" width="25" height="18" rx="3" stroke="#a78bfa" stroke-width="2"/><path d="M35 29h10M35 55h10" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M22 38v8M57 38v8" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 3"/></svg>
+      </div>
+      <div class="card-body">
+        <h3>Enterprise Tool Rollout & Adoption</h3>
+        <p>Organization-wide implementation of project management tooling with governance frameworks, training materials, and adoption playbooks that became team standards.</p>
+        <div class="card-tags">
+          <span>Change Management</span><span>Asana</span><span>Training Design</span><span>Governance</span>
+        </div>
+        <a href="asana-rollout.html" class="card-link">Launch Demo →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <span class="section-label">Background</span>
+  <h2>How I Work</h2>
+  <div class="about">
+    <div class="about-text">
+      <p>I'm a program manager who builds. Not just plans, decks, and status reports — actual production systems that teams depend on every day.</p>
+      <p>Over 5+ years at a Fortune 500 entertainment company, I grew from Admin to Program Manager while taking on increasingly technical scope: building web applications, architecting data pipelines, designing AI-powered workflows, and leading enterprise tool rollouts.</p>
+      <p>My approach is informed by frameworks from Strategic Project Management Made Simple, Good Strategy/Bad Strategy, Influence Without Authority, and The Goal. I focus on identifying constraints, building scalable systems, and creating the playbooks and operating models that become organizational standards.</p>
+      <p>I use AI tools as a force multiplier — not to replace thinking, but to accelerate building. I scope the problem, architect the solution, and ship working products that solve real operational pain points.</p>
+    </div>
+    <div>
+      <div class="skills-grid">
+        <div class="skill-item"><strong>Programs</strong>Onboarding at Scale, L&D, Feedback Systems, Cross-functional Coordination</div>
+        <div class="skill-item"><strong>Technical</strong>Node.js, Express, MongoDB, Google Apps Script, APIs, GitHub</div>
+        <div class="skill-item"><strong>Data</strong>Airtable, Looker Studio, Tableau, ETL Pipelines, Schema Design</div>
+        <div class="skill-item"><strong>AI & Automation</strong>AI-Powered Workflows, Process Automation, Intake Systems</div>
+        <div class="skill-item"><strong>Strategy</strong>OKRs, Budget Management, Vendor Negotiation, Change Management</div>
+        <div class="skill-item"><strong>Tools</strong>Asana (Ambassador), Workday, LMS Platforms, Google Workspace</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 Helena Cohee. Built with purpose.</p>
+  <div>
+    <a href="https://linkedin.com/in/helenabcohee" target="_blank" style="margin-right:1.5rem">LinkedIn</a>
+    <a href="https://github.com/HelenaCohee" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+</body>
+</html>
