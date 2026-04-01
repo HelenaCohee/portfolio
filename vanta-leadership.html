@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manager Readiness Dashboard — Vanta Leadership Enablement</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAFA;--card:#FFFFFF;--border:#E5E7EB;--text:#111827;--muted:#6B7280;--accent:#4F46E5;--accent-light:#EEF2FF;--green:#059669;--green-bg:#ECFDF5;--amber:#D97706;--amber-bg:#FFFBEB;--red:#DC2626;--red-bg:#FEF2F2;--blue:#2563EB;--blue-bg:#EFF6FF}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6}
+
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
+.logo-divider{width:1px;height:24px;background:var(--border)}
+.header-title{font-size:14px;font-weight:600;color:var(--text)}
+.header-sub{font-size:12px;color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:12px}
+.badge{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.5px}
+.badge.live{background:var(--green-bg);color:var(--green)}
+.badge.q1{background:var(--accent-light);color:var(--accent)}
+
+.container{max-width:1200px;margin:0 auto;padding:32px 40px 80px}
+
+.hero{margin-bottom:32px}
+.hero h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.hero p{font-size:14px;color:var(--muted);max-width:600px}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.stat-card.green::before{background:var(--green)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-card.accent::before{background:var(--accent)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-n{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1}
+.stat-card.green .stat-n{color:var(--green)}
+.stat-card.amber .stat-n{color:var(--amber)}
+.stat-card.accent .stat-n{color:var(--accent)}
+.stat-card.blue .stat-n{color:var(--blue)}
+.stat-l{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:6px}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.section-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:32px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+
+.competency-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.comp-label{font-size:13px;font-weight:500;width:200px;flex-shrink:0}
+.comp-track{flex:1;height:8px;background:#F3F4F6;border-radius:4px;overflow:hidden}
+.comp-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.25,.46,.45,.94)}
+.comp-fill.green{background:var(--green)}.comp-fill.amber{background:var(--amber)}.comp-fill.red{background:var(--red)}.comp-fill.accent{background:var(--accent)}
+.comp-val{font-size:13px;font-weight:700;width:40px;text-align:right;flex-shrink:0}
+.comp-val.green{color:var(--green)}.comp-val.amber{color:var(--amber)}.comp-val.red{color:var(--red)}
+
+.launch-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px;transition:background .15s}
+.launch-card:hover{background:#FAFAFA}
+.launch-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.launch-icon.shipped{background:var(--green-bg);color:var(--green)}
+.launch-icon.prep{background:var(--amber-bg);color:var(--amber)}
+.launch-icon.planned{background:var(--blue-bg);color:var(--blue)}
+.launch-info{flex:1}
+.launch-name{font-size:14px;font-weight:600}
+.launch-meta{font-size:12px;color:var(--muted)}
+.launch-status{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px}
+.launch-status.shipped{background:var(--green-bg);color:var(--green)}
+.launch-status.prep{background:var(--amber-bg);color:var(--amber)}
+.launch-status.planned{background:var(--blue-bg);color:var(--blue)}
+
+.ai-metric{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.ai-metric:last-child{border-bottom:none}
+.ai-metric-label{font-size:13px;color:var(--text)}
+.ai-metric-val{font-size:14px;font-weight:700}
+.ai-metric-val.green{color:var(--green)}.ai-metric-val.amber{color:var(--amber)}.ai-metric-val.red{color:var(--red)}
+
+.team-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F3F4F6}
+.team-row:last-child{border-bottom:none}
+.team-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0}
+.team-name{font-size:13px;font-weight:500;flex:1}
+.team-score{font-size:13px;font-weight:700;width:40px;text-align:right}
+.team-trend{font-size:11px;width:36px;text-align:right}
+.team-trend.up{color:var(--green)}.team-trend.down{color:var(--red)}.team-trend.flat{color:var(--muted)}
+
+.callout{padding:16px 20px;border-radius:10px;margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.callout.insight{background:var(--accent-light);border:1px solid #C7D2FE}
+.callout.warning{background:var(--amber-bg);border:1px solid #FDE68A}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.callout-text{font-size:13px;color:var(--text);line-height:1.6}
+.callout-text strong{font-weight:600}
+
+.footer{text-align:center;padding:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:40px}
+.footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:768px){.stats-row,.grid-2,.grid-3{grid-template-columns:1fr}.container{padding:20px 16px}.header{padding:16px 20px;flex-direction:column;gap:12px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="logo">VANTA</div>
+    <div class="logo-divider"></div>
+    <div><div class="header-title">Manager Readiness Dashboard</div><div class="header-sub">People Enablement &middot; Leadership Development</div></div>
+  </div>
+  <div class="header-right">
+    <span class="badge live">&#x25CF; Live</span>
+    <span class="badge q1">Q1 2026</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h1>Trust-First Leadership</h1>
+    <p>Real-time visibility into manager readiness across Vanta-specific competencies. Synchronized to product launches so leadership enablement moves at the speed of the product.</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card green"><div class="stat-n">78%</div><div class="stat-l">Overall Readiness</div><div class="stat-sub">+12pts from Q4 2025</div></div>
+    <div class="stat-card accent"><div class="stat-n">142</div><div class="stat-l">Active Managers</div><div class="stat-sub">Across 6 global offices</div></div>
+    <div class="stat-card amber"><div class="stat-n">23</div><div class="stat-l">New Managers (Q1)</div><div class="stat-sub">Avg 4.2 weeks to baseline</div></div>
+    <div class="stat-card blue"><div class="stat-n">91%</div><div class="stat-l">AI Toolkit Adoption</div><div class="stat-sub">Using 2+ AI coaching tools</div></div>
+  </div>
+
+  <div class="section-label">Competency Readiness</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Vanta-Specific Competencies</div>
+      <div class="card-sub">Manager readiness by leadership domain</div>
+      <div class="competency-row"><div class="comp-label">Trust Culture Fluency</div><div class="comp-track"><div class="comp-fill green" data-w="86"></div></div><div class="comp-val green">86%</div></div>
+      <div class="competency-row"><div class="comp-label">AI-First Decision Making</div><div class="comp-track"><div class="comp-fill amber" data-w="71"></div></div><div class="comp-val amber">71%</div></div>
+      <div class="competency-row"><div class="comp-label">Distributed Team Leadership</div><div class="comp-track"><div class="comp-fill green" data-w="82"></div></div><div class="comp-val green">82%</div></div>
+      <div class="competency-row"><div class="comp-label">Compliance-Aware Management</div><div class="comp-track"><div class="comp-fill green" data-w="79"></div></div><div class="comp-val green">79%</div></div>
+      <div class="competency-row"><div class="comp-label">Feedback & Coaching Cadence</div><div class="comp-track"><div class="comp-fill amber" data-w="68"></div></div><div class="comp-val amber">68%</div></div>
+      <div class="competency-row"><div class="comp-label">Product Launch Readiness</div><div class="comp-track"><div class="comp-fill amber" data-w="64"></div></div><div class="comp-val amber">64%</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">AI Coaching Toolkit Metrics</div>
+      <div class="card-sub">Manager adoption of AI-enabled leadership tools</div>
+      <div class="ai-metric"><span class="ai-metric-label">AI-assisted 1:1 prep</span><span class="ai-metric-val green">87%</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">AI team health summaries</span><span class="ai-metric-val green">79%</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">AI coaching prompts used weekly</span><span class="ai-metric-val amber">62%</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">Decision framework adoption</span><span class="ai-metric-val amber">58%</span></div>
+      <div class="ai-metric"><span class="ai-metric-label">Adaptive learning completion</span><span class="ai-metric-val red">41%</span></div>
+
+      <div class="callout warning" style="margin-top:16px">
+        <div class="callout-icon">&#x26A0;</div>
+        <div class="callout-text"><strong>Adaptive learning completion is the constraint.</strong> Managers are adopting point tools (1:1 prep, summaries) but not completing the structured learning paths. Recommendation: shorten modules to &lt;10 min and embed them directly in Slack.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Product-Synchronized Enablement</div>
+  <div class="grid-2">
+    <div class="card" style="padding:16px">
+      <div class="card-title" style="padding:0 8px;margin-bottom:12px">Product Launch Readiness Tracker</div>
+      <div class="launch-card"><div class="launch-icon shipped">&#x2713;</div><div class="launch-info"><div class="launch-name">AI Agents Launch (March 2026)</div><div class="launch-meta">Compliance, TPRM, Customer Trust agents</div></div><span class="launch-status shipped">Module shipped</span></div>
+      <div class="launch-card"><div class="launch-icon shipped">&#x2713;</div><div class="launch-info"><div class="launch-name">Enterprise Controls & Scoping</div><div class="launch-meta">Adaptive BU scoping, control framework</div></div><span class="launch-status shipped">Module shipped</span></div>
+      <div class="launch-card"><div class="launch-icon prep">&#x25CB;</div><div class="launch-info"><div class="launch-name">Privacy Automation (ROPA/DPIA)</div><div class="launch-meta">Data governance integration</div></div><span class="launch-status prep">In prep</span></div>
+      <div class="launch-card"><div class="launch-icon planned">&#x2192;</div><div class="launch-info"><div class="launch-name">Q2 Product Release (TBD)</div><div class="launch-meta">Pending product roadmap alignment</div></div><span class="launch-status planned">Planned</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Manager Ramp by Cohort</div>
+      <div class="card-sub">Weeks to baseline readiness (target: &lt;4 weeks)</div>
+      <div class="team-row"><div class="team-avatar" style="background:var(--accent)">SF</div><div class="team-name">San Francisco (38 managers)</div><div class="team-score" style="color:var(--green)">3.1w</div><div class="team-trend up">&uarr; 0.4</div></div>
+      <div class="team-row"><div class="team-avatar" style="background:#7C3AED">NY</div><div class="team-name">New York (29 managers)</div><div class="team-score" style="color:var(--green)">3.4w</div><div class="team-trend up">&uarr; 0.2</div></div>
+      <div class="team-row"><div class="team-avatar" style="background:#2563EB">LN</div><div class="team-name">London (24 managers)</div><div class="team-score" style="color:var(--amber)">4.1w</div><div class="team-trend flat">&mdash;</div></div>
+      <div class="team-row"><div class="team-avatar" style="background:#059669">DB</div><div class="team-name">Dublin (22 managers)</div><div class="team-score" style="color:var(--green)">3.8w</div><div class="team-trend up">&uarr; 0.6</div></div>
+      <div class="team-row"><div class="team-avatar" style="background:#DC2626">TL</div><div class="team-name">Tel Aviv (16 managers)</div><div class="team-score" style="color:var(--amber)">4.3w</div><div class="team-trend down">&darr; 0.3</div></div>
+      <div class="team-row"><div class="team-avatar" style="background:#D97706">SY</div><div class="team-name">Sydney (13 managers)</div><div class="team-score" style="color:var(--red)">5.1w</div><div class="team-trend down">&darr; 0.7</div></div>
+
+      <div class="callout insight" style="margin-top:16px">
+        <div class="callout-icon">&#x1F4A1;</div>
+        <div class="callout-text"><strong>Sydney is the outlier.</strong> 5.1 weeks to baseline vs. 3.1 in SF. Time zone gap means async enablement content needs to be stronger. Recommendation: build a self-paced leadership onboarding path optimized for APAC.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Strategic Recommendations</div>
+  <div class="grid-3">
+    <div class="card" style="border-top:3px solid var(--green)">
+      <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Protect</div>
+      <div class="card-title" style="font-size:14px">Trust culture fluency is strong</div>
+      <p style="font-size:13px;color:var(--muted);margin-top:8px">86% readiness. This is the foundation. Don't dilute it by over-indexing on new competencies. Keep the core culture module in every cohort.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Invest</div>
+      <div class="card-title" style="font-size:14px">Product launch readiness is the gap</div>
+      <p style="font-size:13px;color:var(--muted);margin-top:8px">64% readiness. Managers aren't getting enough context before launches. Sync enablement modules to the product release calendar — 48-hour turnaround.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent)">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Experiment</div>
+      <div class="card-title" style="font-size:14px">AI coaching has adoption, not depth</div>
+      <p style="font-size:13px;color:var(--muted);margin-top:8px">91% use AI tools, but only 41% complete structured learning. Shift from courses to embedded nudges — Slack-native micro-interventions at the moment of need.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Built by <a href="https://helenacohee.github.io/portfolio/">Helena Cohee</a> &middot; Prototype for Vanta People Enablement &middot; Sample data for demonstration &middot; <a href="https://linkedin.com/in/helenabcohee">LinkedIn</a>
+</div>
+
+<script>
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    document.querySelectorAll('.comp-fill').forEach(function(el){
+      el.style.width = (el.dataset.w || 0) + '%';
+    });
+  }, 200);
+});
+</script>
+</body>
+</html>
