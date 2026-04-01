@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enablement Pipeline Dashboard — Cribl Remote Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0F1117;--card:#1A1D27;--card2:#22252F;--border:rgba(255,255,255,0.08);--text:#E8E9ED;--muted:#8B8D97;--orange:#F97316;--orange-dim:rgba(249,115,22,0.12);--green:#22C55E;--green-dim:rgba(34,197,94,0.1);--amber:#FBBF24;--amber-dim:rgba(251,191,36,0.1);--red:#EF4444;--red-dim:rgba(239,68,68,0.1);--blue:#3B82F6;--blue-dim:rgba(59,130,246,0.1);--purple:#A78BFA;--purple-dim:rgba(167,139,250,0.1)}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.6}
+
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:800;color:var(--orange);letter-spacing:1px}
+.header-meta{font-size:12px;color:var(--muted)}
+.badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:0.5px;background:var(--orange-dim);color:var(--orange)}
+
+.container{max-width:1200px;margin:0 auto;padding:28px 32px 80px}
+
+.hero{margin-bottom:28px}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.hero h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.hero p{font-size:13px;color:var(--muted);max-width:640px}
+
+.pipeline-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:0;align-items:stretch;margin-bottom:28px}
+.pipe-stage{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+.pipe-stage .stage-icon{font-size:24px;margin-bottom:8px}
+.pipe-stage .stage-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.pipe-stage .stage-n{font-size:28px;font-weight:800;line-height:1}
+.pipe-stage .stage-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.pipe-stage.design{border-top:3px solid var(--blue)}.pipe-stage.design .stage-n{color:var(--blue)}
+.pipe-stage.deliver{border-top:3px solid var(--orange)}.pipe-stage.deliver .stage-n{color:var(--orange)}
+.pipe-stage.adopt{border-top:3px solid var(--green)}.pipe-stage.adopt .stage-n{color:var(--green)}
+.pipe-stage.reinforce{border-top:3px solid var(--purple)}.pipe-stage.reinforce .stage-n{color:var(--purple)}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;padding:0 6px}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+
+.sec-label{font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;margin-top:20px}
+
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:12px;color:var(--muted);width:160px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.25,.46,.45,.94)}
+.bar-val{font-size:12px;font-weight:700;width:40px;text-align:right;flex-shrink:0}
+
+.pillar-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+.pillar-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pillar-card.km::before{background:var(--blue)}
+.pillar-card.rn::before{background:var(--orange)}
+.pillar-card.sp::before{background:var(--purple)}
+.pillar-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.pillar-card.km .pillar-tag{color:var(--blue)}.pillar-card.rn .pillar-tag{color:var(--orange)}.pillar-card.sp .pillar-tag{color:var(--purple)}
+.pillar-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.pillar-body{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.pillar-metrics{display:flex;gap:16px}
+.pm{text-align:center}
+.pm-n{font-size:20px;font-weight:800;line-height:1}
+.pm-l{font-size:10px;color:var(--muted);margin-top:2px}
+
+.champion-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.champion-row:last-child{border-bottom:none}
+.ch-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ch-name{font-size:12px;flex:1}
+.ch-region{font-size:11px;color:var(--muted);width:60px}
+.ch-activity{font-size:11px;font-weight:600;width:50px;text-align:right}
+.ch-activity.high{color:var(--green)}.ch-activity.med{color:var(--amber)}.ch-activity.low{color:var(--red)}
+
+.callout{padding:14px 18px;border-radius:10px;margin-top:12px;display:flex;gap:10px;align-items:flex-start}
+.callout.insight{background:var(--orange-dim);border:1px solid rgba(249,115,22,0.2)}
+.callout.warning{background:var(--amber-dim);border:1px solid rgba(251,191,36,0.2)}
+.callout.success{background:var(--green-dim);border:1px solid rgba(34,197,94,0.2)}
+.callout-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.callout-text{font-size:12px;line-height:1.6}
+.callout-text strong{font-weight:600;color:var(--text)}
+
+.reco-card{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.reco-n{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.reco-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.reco-title em{color:var(--orange);font-style:normal}
+.reco-body{font-size:12px;color:var(--muted);line-height:1.6}
+
+.footer{text-align:center;padding:32px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:32px}
+.footer a{color:var(--orange);text-decoration:none}
+
+@media(max-width:768px){.pipeline-flow,.grid-2,.grid-3{grid-template-columns:1fr}.pipe-arrow{display:none}.container{padding:20px 16px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:12px"><span class="logo">CRIBL</span><span style="color:var(--muted);font-size:12px">&middot; Remote Ops &middot; Enablement Pipeline</span></div>
+  <div style="display:flex;gap:8px"><span class="badge">Q1 2026</span><span class="badge" style="background:var(--green-dim);color:var(--green)">&#x25CF; Live</span></div>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-eyebrow">Enablement Observability</div>
+    <h1>See where enablement flows. See where it drops.</h1>
+    <p>Applying Cribl's pipeline philosophy to internal enablement: route content to the right audience, reduce noise, enrich with AI and community, and measure what actually changes behavior.</p>
+  </div>
+
+  <!-- PIPELINE FLOW -->
+  <div class="pipeline-flow">
+    <div class="pipe-stage design"><div class="stage-icon">&#x270E;</div><div class="stage-name">Design</div><div class="stage-n">14</div><div class="stage-sub">Active modules</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-stage deliver"><div class="stage-icon">&#x1F4E1;</div><div class="stage-name">Deliver</div><div class="stage-n">89%</div><div class="stage-sub">Reach rate</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-stage adopt"><div class="stage-icon">&#x2705;</div><div class="stage-name">Adopt</div><div class="stage-n">71%</div><div class="stage-sub">Behavior change</div></div>
+    <div class="pipe-arrow">&rarr;</div>
+    <div class="pipe-stage reinforce"><div class="stage-icon">&#x1F504;</div><div class="stage-name">Reinforce</div><div class="stage-n">58%</div><div class="stage-sub">Sustained at 30d</div></div>
+  </div>
+
+  <div class="callout insight">
+    <div class="callout-icon">&#x1F50D;</div>
+    <div class="callout-text"><strong>The pipeline leak is between Adopt and Reinforce.</strong> 71% of employees adopt new behaviors after enablement, but only 58% sustain them at 30 days. That 13-point drop is where champion networks and async reinforcement need to do the heavy lifting.</div>
+  </div>
+
+  <!-- REMOTE OPS PILLARS -->
+  <div class="sec-label" style="margin-top:24px">Remote Ops Pillars</div>
+  <div class="grid-3">
+    <div class="pillar-card km">
+      <div class="pillar-tag">Knowledge Management</div>
+      <div class="pillar-title">Find it before you ask it</div>
+      <div class="pillar-body">Self-serve resource quality, search-to-answer rate, documentation freshness</div>
+      <div class="pillar-metrics">
+        <div class="pm"><div class="pm-n" style="color:var(--green)">76%</div><div class="pm-l">Self-serve rate</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--amber)">62%</div><div class="pm-l">Doc freshness</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--blue)">3.2s</div><div class="pm-l">Avg search time</div></div>
+      </div>
+    </div>
+    <div class="pillar-card rn">
+      <div class="pillar-tag">Remote Norms</div>
+      <div class="pillar-title">Same culture, any timezone</div>
+      <div class="pillar-body">Meeting hygiene, async-first adoption, communication norms compliance</div>
+      <div class="pillar-metrics">
+        <div class="pm"><div class="pm-n" style="color:var(--green)">81%</div><div class="pm-l">Async-first</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--amber)">67%</div><div class="pm-l">Meeting hygiene</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--orange)">74%</div><div class="pm-l">Norms adherence</div></div>
+      </div>
+    </div>
+    <div class="pillar-card sp">
+      <div class="pillar-tag">Strategic Programs</div>
+      <div class="pillar-title">AI adoption & tool fluency</div>
+      <div class="pillar-body">AI tool adoption, new hire onboarding velocity, strategic initiative completion</div>
+      <div class="pillar-metrics">
+        <div class="pm"><div class="pm-n" style="color:var(--green)">84%</div><div class="pm-l">AI adoption</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--amber)">3.8w</div><div class="pm-l">Onboard ramp</div></div>
+        <div class="pm"><div class="pm-n" style="color:var(--purple)">69%</div><div class="pm-l">Initiative done</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEHAVIOR CHANGE + CHAMPIONS -->
+  <div class="sec-label">Adoption by Audience & Champion Network</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Behavior Change by Audience</div>
+      <div class="card-sub">% demonstrating sustained behavior at 30 days post-enablement</div>
+      <div class="bar-row"><div class="bar-label">New Hires (0-90 days)</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="78"></div></div><div class="bar-val" style="color:var(--green)">78%</div></div>
+      <div class="bar-row"><div class="bar-label">Individual Contributors</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="72"></div></div><div class="bar-val" style="color:var(--green)">72%</div></div>
+      <div class="bar-row"><div class="bar-label">Managers</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="61"></div></div><div class="bar-val" style="color:var(--amber)">61%</div></div>
+      <div class="bar-row"><div class="bar-label">Executives</div><div class="bar-track"><div class="bar-fill" style="background:var(--red)" data-w="44"></div></div><div class="bar-val" style="color:var(--red)">44%</div></div>
+      <div class="bar-row"><div class="bar-label">Engineering Teams</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="65"></div></div><div class="bar-val" style="color:var(--amber)">65%</div></div>
+      <div class="bar-row"><div class="bar-label">GTM Teams</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="74"></div></div><div class="bar-val" style="color:var(--green)">74%</div></div>
+      <div class="callout warning">
+        <div class="callout-icon">&#x26A0;</div>
+        <div class="callout-text"><strong>Executive adoption at 44% is the weakest signal.</strong> If leaders don't model the behaviors, reinforcement stalls downstream. Recommendation: build an executive-specific micro-enablement track — 5 min max, Slack-native, tied to company metrics they already watch.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Champion Network Health</div>
+      <div class="card-sub">Active champions driving peer-to-peer adoption</div>
+      <div class="champion-row"><div class="ch-dot" style="background:var(--green)"></div><div class="ch-name">Engineering Champions</div><div class="ch-region">Global</div><div class="ch-activity high">Active</div></div>
+      <div class="champion-row"><div class="ch-dot" style="background:var(--green)"></div><div class="ch-name">GTM Champions</div><div class="ch-region">US/EMEA</div><div class="ch-activity high">Active</div></div>
+      <div class="champion-row"><div class="ch-dot" style="background:var(--amber)"></div><div class="ch-name">G&A Champions</div><div class="ch-region">US</div><div class="ch-activity med">Moderate</div></div>
+      <div class="champion-row"><div class="ch-dot" style="background:var(--red)"></div><div class="ch-name">APAC Champions</div><div class="ch-region">APAC</div><div class="ch-activity low">Inactive</div></div>
+      <div class="champion-row"><div class="ch-dot" style="background:var(--amber)"></div><div class="ch-name">New Hire Mentors</div><div class="ch-region">Global</div><div class="ch-activity med">Moderate</div></div>
+      <div style="margin-top:16px;padding:12px;background:var(--card2);border-radius:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Champion Impact</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Teams with an active champion show <strong style="color:var(--green)">23% higher</strong> behavior adoption at 30 days vs. teams without one. The APAC network needs activation — no champion has posted in 3+ weeks.</div>
+      </div>
+      <div class="callout success" style="margin-top:12px">
+        <div class="callout-icon">&#x2713;</div>
+        <div class="callout-text"><strong>Engineering champions are the model.</strong> Replicate their cadence (biweekly async thread + monthly live Q&A) for GTM and G&A to scale adoption without adding headcount.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="sec-label">Pipeline Recommendations</div>
+  <div class="grid-3">
+    <div class="reco-card"><div class="reco-n">Route</div><div class="reco-title">Build <em>audience routing</em> into every module</div><div class="reco-body">Stop sending everything to everyone. Tag content by audience (new hire, manager, engineer, GTM) and deliver through the channel they're already in.</div></div>
+    <div class="reco-card"><div class="reco-n">Reduce</div><div class="reco-title">Kill modules with <em>&lt;50% adoption</em></div><div class="reco-body">3 of 14 active modules have adoption below 50%. Either redesign or retire them. Less content, more behavior change.</div></div>
+    <div class="reco-card"><div class="reco-n">Enrich</div><div class="reco-title">Activate <em>APAC champions</em> this quarter</div><div class="reco-body">The 13-point drop from adoption to reinforcement is worst in APAC. A single active champion per timezone closes the gap faster than any new content.</div></div>
+  </div>
+</div>
+
+<div class="footer">
+  Built by <a href="https://helenacohee.github.io/portfolio/">Helena Cohee</a> &middot; Prototype for Cribl Remote Ops &middot; Sample data for demonstration &middot; <a href="https://linkedin.com/in/helenabcohee">LinkedIn</a>
+</div>
+
+<script>
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    document.querySelectorAll('.bar-fill').forEach(function(el){
+      el.style.width=(el.dataset.w||0)+'%';
+    });
+  },200);
+});
+</script>
+</body>
+</html>
