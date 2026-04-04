@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMO Strategic Initiative Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#07080B;--card:#111318;--card2:#181B23;--card3:#1F232D;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--text:#E8E9ED;--muted:#6B6F7B;--dim:#3E4150;--teal:#2DD4BF;--teal-dim:rgba(45,212,191,0.1);--green:#22C55E;--green-dim:rgba(34,197,94,0.08);--amber:#FBBF24;--amber-dim:rgba(251,191,36,0.08);--red:#EF4444;--red-dim:rgba(239,68,68,0.08);--blue:#3B82F6;--blue-dim:rgba(59,130,246,0.08);--purple:#A78BFA;--purple-dim:rgba(167,139,250,0.08);--cyan:#06B6D4;--cyan-dim:rgba(6,182,212,0.08);--orange:#F97316;--orange-dim:rgba(249,115,22,0.08)}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.logo-group{display:flex;align-items:center;gap:12px}
+.logo{font-size:15px;font-weight:800;color:var(--teal);letter-spacing:1.5px}
+.logo-divider{width:1px;height:16px;background:var(--border2)}
+.logo-sub{font-size:12px;color:var(--muted);font-weight:500}
+.header-right{display:flex;gap:6px;align-items:center}
+.badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+
+.nav-tabs{display:flex;gap:0;background:var(--card);border-bottom:1px solid var(--border);padding:0 32px;position:sticky;top:49px;z-index:99;overflow-x:auto}
+.nav-tab{padding:10px 20px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+
+.container{max-width:1280px;margin:0 auto;padding:24px 32px 80px}
+.tab-content{display:none}.tab-content.active{display:block}
+.hero{margin-bottom:20px;padding:16px 0}
+.hero-eyebrow{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.hero h1{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.hero p{font-size:13px;color:var(--muted);max-width:600px}
+.sec-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;margin-top:24px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.3s}
+.card:hover{border-color:var(--border2)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi-n{font-size:28px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}
+.kpi-l{font-size:10px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* INITIATIVE ROWS */
+.init-row{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:all 0.3s;overflow:hidden}
+.init-row:hover{border-color:var(--border2)}
+.init-row.expanded{background:var(--card2);border-color:var(--border2)}
+.init-row-top{padding:14px 18px;display:grid;grid-template-columns:28px 1fr 100px 80px 80px 90px 30px;align-items:center;gap:10px}
+.init-drag{color:var(--dim);font-size:14px;cursor:grab;user-select:none}
+.init-drag:active{cursor:grabbing}
+.init-name{font-size:13px;font-weight:700}
+.init-owner{font-size:11px;color:var(--muted)}
+.init-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:100px;text-align:center;text-transform:uppercase;letter-spacing:0.5px}
+.s-green{background:var(--green-dim);color:var(--green)}.s-amber{background:var(--amber-dim);color:var(--amber)}.s-red{background:var(--red-dim);color:var(--red)}.s-blue{background:var(--blue-dim);color:var(--blue)}.s-purple{background:var(--purple-dim);color:var(--purple)}
+.init-progress{width:100%;height:4px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden}
+.init-progress-fill{height:100%;border-radius:2px;transition:width 0.8s ease}
+.init-risk{font-size:10px;font-weight:700;text-align:center}
+.init-expand{color:var(--dim);font-size:16px;transition:transform 0.3s}
+.init-row.expanded .init-expand{transform:rotate(180deg)}
+.init-detail{max-height:0;overflow:hidden;transition:max-height 0.5s ease}
+.init-row.expanded .init-detail{max-height:400px}
+.init-detail-inner{padding:0 18px 18px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:14px;margin-top:0}
+.detail-block{}.detail-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.detail-val{color:var(--text);font-weight:500}
+.dep-tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;background:var(--card3);border:1px solid var(--border);margin:2px;color:var(--muted)}
+
+/* CAPACITY */
+.cap-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cap-label{font-size:12px;width:100px;flex-shrink:0}
+.cap-track{flex:1;height:8px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;position:relative}
+.cap-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.cap-val{font-size:12px;font-weight:700;width:40px;text-align:right;font-family:'JetBrains Mono',monospace}
+
+/* INTAKE */
+.intake-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px}
+.intake-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;transition:border-color 0.2s}
+.intake-input:focus{border-color:var(--teal)}
+.intake-input::placeholder{color:var(--dim)}
+textarea.intake-input{height:80px;resize:vertical}
+.intake-btn{background:var(--teal);color:var(--bg);border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.2s;width:100%}
+.intake-btn:hover{opacity:0.85}
+.intake-result{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:14px;display:none;animation:fadeIn 0.3s ease}
+.intake-result.show{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:12px;color:var(--muted)}.result-val{font-size:13px;font-weight:700}
+
+/* EXEC SUMMARY */
+.exec-block{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px}
+.exec-title{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.exec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.exec-text{font-size:12px;color:var(--muted);line-height:1.7}
+
+/* RISK MATRIX */
+.risk-matrix{display:grid;grid-template-columns:40px repeat(3,1fr);grid-template-rows:auto repeat(3,80px);gap:4px}
+.risk-axis{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-lr;transform:rotate(180deg)}
+.risk-header{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;text-align:center;padding:4px}
+.risk-cell{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
+.risk-cell.high-risk{background:var(--red-dim);border-color:rgba(239,68,68,0.15)}
+.risk-cell.med-risk{background:var(--amber-dim);border-color:rgba(251,191,36,0.15)}
+.risk-cell.low-risk{background:var(--green-dim);border-color:rgba(34,197,94,0.15)}
+.risk-dot{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--bg);cursor:pointer;transition:transform 0.2s}
+.risk-dot:hover{transform:scale(1.2)}
+.risk-dot[title]:hover::after{content:attr(title)}
+
+/* CALLOUT */
+.callout{padding:12px 16px;border-radius:10px;margin-top:10px;display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.6}
+.callout strong{font-weight:600;color:var(--text)}
+.callout.insight{background:var(--teal-dim);border:1px solid rgba(45,212,191,0.15)}
+.callout.warning{background:var(--amber-dim);border:1px solid rgba(251,191,36,0.15)}
+.callout.success{background:var(--green-dim);border:1px solid rgba(34,197,94,0.15)}
+
+.footer{text-align:center;padding:32px;font-size:11px;color:var(--dim);border-top:1px solid var(--border);margin-top:32px}
+.footer a{color:var(--teal);text-decoration:none}
+
+@media(max-width:768px){.kpi-row,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.init-row-top{grid-template-columns:1fr;gap:6px}.container{padding:20px 16px}.risk-matrix{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-group"><span class="logo">PMO TRACKER</span><div class="logo-divider"></div><span class="logo-sub">Strategic Initiative Portfolio</span></div>
+  <div class="header-right"><span class="badge" style="background:var(--teal-dim);color:var(--teal)">Q2 2026</span><span class="badge" style="background:var(--green-dim);color:var(--green)">10 Active</span></div>
+</div>
+<div class="nav-tabs">
+  <div class="nav-tab active" data-tab="dashboard">Dashboard</div>
+  <div class="nav-tab" data-tab="initiatives">Initiatives</div>
+  <div class="nav-tab" data-tab="intake">AI Intake</div>
+  <div class="nav-tab" data-tab="risk">Risk Matrix</div>
+  <div class="nav-tab" data-tab="exec">Executive Summary</div>
+</div>
+<div class="container">
+
+<!-- TAB 1: DASHBOARD -->
+<div class="tab-content active" id="tab-dashboard">
+  <div class="hero">
+    <div class="hero-eyebrow">Strategic Portfolio View</div>
+    <h1>10 initiatives. One roadmap. Zero surprises.</h1>
+    <p>Company-wide Focus Initiatives tracked from discovery through execution. Click any metric to explore. Expand any initiative for dependencies, risks, and next actions.</p>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-n" style="color:var(--teal)">10</div><div class="kpi-l">Active Initiatives</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--green)">6</div><div class="kpi-l">On Track</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--amber)">3</div><div class="kpi-l">At Risk</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--red)">1</div><div class="kpi-l">Blocked</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--teal)">68%</div><div class="kpi-l">Avg Completion</div></div>
+  </div>
+
+  <div class="sec-label">Team Capacity</div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="cap-bar"><div class="cap-label">Engineering</div><div class="cap-track"><div class="cap-fill" style="width:88%;background:var(--red)"></div></div><div class="cap-val" style="color:var(--red)">88%</div></div>
+    <div class="cap-bar"><div class="cap-label">Product</div><div class="cap-track"><div class="cap-fill" style="width:72%;background:var(--amber)"></div></div><div class="cap-val" style="color:var(--amber)">72%</div></div>
+    <div class="cap-bar"><div class="cap-label">Design</div><div class="cap-track"><div class="cap-fill" style="width:55%;background:var(--green)"></div></div><div class="cap-val" style="color:var(--green)">55%</div></div>
+    <div class="cap-bar"><div class="cap-label">Marketing</div><div class="cap-track"><div class="cap-fill" style="width:64%;background:var(--amber)"></div></div><div class="cap-val" style="color:var(--amber)">64%</div></div>
+    <div class="cap-bar"><div class="cap-label">Operations</div><div class="cap-track"><div class="cap-fill" style="width:41%;background:var(--green)"></div></div><div class="cap-val" style="color:var(--green)">41%</div></div>
+    <div class="callout warning"><div style="flex-shrink:0">&#x26A0;</div><div><strong>Engineering at 88% capacity.</strong> Any new initiative requiring engineering resources should be sequenced for Q3 or traded against an existing commitment. This is the portfolio constraint.</div></div>
+  </div>
+
+  <div class="sec-label">Initiatives by Status</div>
+  <div class="grid-3">
+    <div class="card" style="border-top:3px solid var(--green)"><div class="card-title" style="color:var(--green)">On Track (6)</div><div class="card-sub">Shipping on schedule with no blockers</div><div id="dash-ontrack"></div></div>
+    <div class="card" style="border-top:3px solid var(--amber)"><div class="card-title" style="color:var(--amber)">At Risk (3)</div><div class="card-sub">Active risks requiring mitigation</div><div id="dash-atrisk"></div></div>
+    <div class="card" style="border-top:3px solid var(--red)"><div class="card-title" style="color:var(--red)">Blocked (1)</div><div class="card-sub">Waiting on external dependency</div><div id="dash-blocked"></div></div>
+  </div>
+</div>
+
+<!-- TAB 2: INITIATIVES -->
+<div class="tab-content" id="tab-initiatives">
+  <div class="hero">
+    <div class="hero-eyebrow">All Initiatives</div>
+    <h1>Click to expand. Drag to reprioritize.</h1>
+    <p>Each initiative expands to show the problem statement, dependencies, risk level, owner, and recommended next action.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:28px 1fr 100px 80px 80px 90px 30px;gap:10px;padding:8px 18px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">
+    <div></div><div>Initiative</div><div>Owner</div><div>Status</div><div>Progress</div><div>Risk</div><div></div>
+  </div>
+  <div id="initiatives-list"></div>
+</div>
+
+<!-- TAB 3: AI INTAKE -->
+<div class="tab-content" id="tab-intake">
+  <div class="hero">
+    <div class="hero-eyebrow">AI-Powered Project Intake</div>
+    <h1>Describe the project. AI does the rest.</h1>
+    <p>Submit a new project request and watch it get auto-classified by priority, strategic alignment, estimated effort, and recommended sequencing — the way a PMO should process intake.</p>
+  </div>
+  <div class="grid-2">
+    <div class="intake-form">
+      <div class="card-title">New Initiative Request</div>
+      <div class="card-sub">Fill in what you know. The AI classifies the rest.</div>
+      <input class="intake-input" id="intake-title" placeholder="Initiative name (e.g., 'Customer Portal Redesign')">
+      <textarea class="intake-input" id="intake-desc" placeholder="Describe the problem this solves and the expected business impact..."></textarea>
+      <input class="intake-input" id="intake-sponsor" placeholder="Executive sponsor (e.g., 'VP Engineering')">
+      <select class="intake-input" id="intake-team" style="height:auto;padding:10px 14px">
+        <option value="">Primary team needed...</option>
+        <option value="Engineering">Engineering</option>
+        <option value="Product">Product</option>
+        <option value="Design">Design</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Operations">Operations</option>
+        <option value="Cross-functional">Cross-functional</option>
+      </select>
+      <button class="intake-btn" id="intake-submit">Classify & Prioritize →</button>
+    </div>
+    <div>
+      <div class="intake-result" id="intake-result">
+        <div class="card-title" style="margin-bottom:14px">AI Classification</div>
+        <div class="result-row"><div class="result-label">Priority Score</div><div class="result-val" id="r-priority"></div></div>
+        <div class="result-row"><div class="result-label">Strategic Alignment</div><div class="result-val" id="r-alignment"></div></div>
+        <div class="result-row"><div class="result-label">Estimated Effort</div><div class="result-val" id="r-effort"></div></div>
+        <div class="result-row"><div class="result-label">Risk Level</div><div class="result-val" id="r-risk"></div></div>
+        <div class="result-row"><div class="result-label">Team Capacity Check</div><div class="result-val" id="r-capacity"></div></div>
+        <div class="result-row"><div class="result-label">Recommended Sequencing</div><div class="result-val" id="r-sequence"></div></div>
+        <div class="result-row"><div class="result-label">Dependencies</div><div class="result-val" id="r-deps"></div></div>
+        <div class="callout insight" style="margin-top:14px" id="r-callout"></div>
+      </div>
+      <div class="callout insight" id="intake-hint"><div style="flex-shrink:0">&#x1F4A1;</div><div><strong>Try it:</strong> Type something like "Build a partner certification program to scale channel revenue" or "Migrate customer data from legacy CRM to new platform" and click classify.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: RISK MATRIX -->
+<div class="tab-content" id="tab-risk">
+  <div class="hero">
+    <div class="hero-eyebrow">Risk Overview</div>
+    <h1>See where the risks cluster.</h1>
+    <p>Every initiative plotted by likelihood vs. impact. Hover over any dot to see the initiative name. The upper-right quadrant needs mitigation plans.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Risk Matrix — Likelihood vs. Impact</div>
+    <div class="card-sub">Initiatives positioned by risk profile. Red zone = needs active mitigation.</div>
+    <div class="risk-matrix">
+      <div></div><div class="risk-header">Low Impact</div><div class="risk-header">Medium Impact</div><div class="risk-header">High Impact</div>
+      <div class="risk-axis">High</div>
+      <div class="risk-cell med-risk" id="rm-hl"></div>
+      <div class="risk-cell high-risk" id="rm-hm"></div>
+      <div class="risk-cell high-risk" id="rm-hh"></div>
+      <div class="risk-axis">Medium</div>
+      <div class="risk-cell low-risk" id="rm-ml"></div>
+      <div class="risk-cell med-risk" id="rm-mm"></div>
+      <div class="risk-cell high-risk" id="rm-mh"></div>
+      <div class="risk-axis">Low</div>
+      <div class="risk-cell low-risk" id="rm-ll"></div>
+      <div class="risk-cell low-risk" id="rm-lm"></div>
+      <div class="risk-cell med-risk" id="rm-lh"></div>
+    </div>
+    <div style="text-align:center;margin-top:8px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">Impact →</div>
+  </div>
+  <div class="callout warning" style="margin-top:10px"><div style="flex-shrink:0">&#x26A0;</div><div><strong>2 initiatives in the high-likelihood / high-impact zone.</strong> Platform Migration is blocked on vendor contract. SOC Automation has a tight Q2 deadline with engineering at 88% capacity. Both need weekly executive check-ins and contingency plans activated.</div></div>
+</div>
+
+<!-- TAB 5: EXEC SUMMARY -->
+<div class="tab-content" id="tab-exec">
+  <div class="hero">
+    <div class="hero-eyebrow">Executive Summary</div>
+    <h1>The 2-minute read for leadership.</h1>
+    <p>Auto-generated status report translating portfolio health into strategic business impact. Updated weekly.</p>
+  </div>
+  <div class="exec-block">
+    <div class="exec-title"><div class="exec-dot" style="background:var(--green)"></div>Portfolio Health: On Track</div>
+    <div class="exec-text">6 of 10 Focus Initiatives are shipping on schedule. Average portfolio completion is 68%, aligned with the Q2 pace target of 65%. Three initiatives carry active risks that are being mitigated — none require escalation at this time. One initiative (Platform Migration) is blocked on a vendor dependency with a resolution ETA of April 18.</div>
+  </div>
+  <div class="exec-block">
+    <div class="exec-title"><div class="exec-dot" style="background:var(--red)"></div>Critical Constraint: Engineering Capacity</div>
+    <div class="exec-text">Engineering is at 88% capacity — the highest of any function. Three Q2 initiatives require significant engineering resources. Recommendation: defer the Data Pipeline Modernization kickoff to Q3 Week 1 to create headroom for SOC Automation, which has a hard Q2 deadline. This trade-off preserves the Q2 commitments without requiring additional headcount.</div>
+  </div>
+  <div class="exec-block">
+    <div class="exec-title"><div class="exec-dot" style="background:var(--amber)"></div>Key Decision Needed</div>
+    <div class="exec-text">The Partner Certification Program is at discovery stage with a P1 priority score. It requires cross-functional resources (Product, Marketing, Operations) but no significant engineering investment. Recommend: approve for Q2 kickoff to take advantage of available non-engineering capacity while engineering bandwidth is constrained. Decision needed by April 11.</div>
+  </div>
+  <div class="exec-block">
+    <div class="exec-title"><div class="exec-dot" style="background:var(--teal)"></div>Wins This Week</div>
+    <div class="exec-text">Customer Onboarding Redesign shipped Phase 1 on schedule — ramp time reduced by 18% in the pilot cohort. AI Copilot Integration reached 73% completion with positive early adoption signals (62% weekly active usage among pilot users). Both initiatives are on track to deliver their intended business value by end of Q2.</div>
+  </div>
+  <div class="callout insight"><div style="flex-shrink:0">&#x1F4A1;</div><div><strong>This summary was generated by synthesizing initiative status, capacity data, risk signals, and milestone completion.</strong> In production, this would pull from Jira/Asana, auto-generate weekly, and format for Slack or email distribution to ELT — eliminating 2+ hours of manual status report writing per week.</div></div>
+</div>
+</div>
+
+<div class="footer">Built by <a href="https://helenacohee.github.io/portfolio/">Helena Cohee</a> · PMO Strategic Initiative Tracker · Sample data for demonstration · <a href="https://linkedin.com/in/helenabcohee">LinkedIn</a></div>
+
+<script>
+const initiatives=[
+  {id:1,name:"Customer Onboarding Redesign",owner:"VP Product",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:73,risk:"Low",riskColor:"var(--green)",problem:"New customer ramp time averages 45 days. Industry benchmark is 28.",next:"Ship Phase 2 (self-serve setup wizard) by April 21.",deps:["Design","Engineering","Customer Success"],riskPos:"lm",color:"var(--green)"},
+  {id:2,name:"AI Copilot Integration",owner:"VP Engineering",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:62,risk:"Medium",riskColor:"var(--amber)",problem:"Support ticket volume growing 40% YoY. AI copilot projected to deflect 35% of Tier 1 tickets.",next:"Complete accuracy benchmark testing by April 14. Target: 92% accuracy before GA.",deps:["Engineering","Product","Support Ops"],riskPos:"mm",color:"var(--blue)"},
+  {id:3,name:"SOC Automation Expansion",owner:"VP Security",status:"at-risk",statusLabel:"At Risk",statusCls:"s-amber",progress:48,risk:"High",riskColor:"var(--red)",problem:"Manual SOC processes can't scale with customer growth. Automation needed to maintain SLAs.",next:"Escalate engineering resourcing. Need 2 additional sprints allocated by April 11 or Q2 deadline at risk.",deps:["Engineering","Security","DevOps"],riskPos:"hh",color:"var(--red)"},
+  {id:4,name:"Platform Migration (Legacy CRM)",owner:"CTO",status:"blocked",statusLabel:"Blocked",statusCls:"s-red",progress:31,risk:"High",riskColor:"var(--red)",problem:"Legacy CRM costs $400K/yr and can't support new product lines. Migration to modern stack required.",next:"Vendor contract negotiation stalled. ETA for resolution: April 18. Contingency: parallel evaluation of alternative vendor.",deps:["Engineering","Sales Ops","Finance","Legal"],riskPos:"hh",color:"var(--red)"},
+  {id:5,name:"Partner Certification Program",owner:"VP Partnerships",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:85,risk:"Low",riskColor:"var(--green)",problem:"Channel partners generate 30% of revenue but have no structured enablement. Inconsistent customer experience.",next:"Launch pilot cohort of 25 partners by April 18. Success metric: 80% certification completion rate.",deps:["Marketing","Product","Partner Ops"],riskPos:"ll",color:"var(--green)"},
+  {id:6,name:"Revenue Dashboard v2",owner:"CFO",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:91,risk:"Low",riskColor:"var(--green)",problem:"Finance team spends 12+ hours/week manually compiling revenue reports from 4 systems.",next:"Final UAT this week. Target ship date: April 11. Will eliminate 12 hrs/week of manual reporting.",deps:["Engineering","Finance","Data"],riskPos:"ll",color:"var(--green)"},
+  {id:7,name:"Global Expansion Readiness",owner:"COO",status:"at-risk",statusLabel:"At Risk",statusCls:"s-amber",progress:55,risk:"Medium",riskColor:"var(--amber)",problem:"EU launch planned for Q3 requires compliance, localization, and operational readiness across 6 functions.",next:"Compliance gap analysis due April 14. Legal review of data residency requirements in progress.",deps:["Legal","Engineering","Compliance","Ops","Marketing","Finance"],riskPos:"mh",color:"var(--orange)"},
+  {id:8,name:"Employee Experience Redesign",owner:"CHRO",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:67,risk:"Low",riskColor:"var(--green)",problem:"Employee NPS dropped 8 points in Q1. Exit interviews cite onboarding and manager quality as top factors.",next:"Manager enablement pilot launching April 14 with 20 managers. Measuring NPS lift at 60 days.",deps:["People Ops","L&D","IT"],riskPos:"lm",color:"var(--green)"},
+  {id:9,name:"Data Pipeline Modernization",owner:"VP Data",status:"at-risk",statusLabel:"At Risk",statusCls:"s-amber",progress:22,risk:"Medium",riskColor:"var(--amber)",problem:"Current ETL pipeline has 6-hour latency. Real-time data needed for AI copilot and revenue dashboard.",next:"Recommend: defer kickoff to Q3 Week 1 to free engineering capacity for SOC Automation (hard Q2 deadline).",deps:["Engineering","Data","Infrastructure"],riskPos:"ml",color:"var(--amber)"},
+  {id:10,name:"Security Compliance Audit Prep",owner:"CISO",status:"on-track",statusLabel:"On Track",statusCls:"s-green",progress:78,risk:"Low",riskColor:"var(--green)",problem:"SOC 2 Type II audit scheduled for June. Need all controls documented and tested by May 15.",next:"14 of 18 controls documented. Remaining 4 in review. On track for May 15 deadline.",deps:["Security","Engineering","Legal","IT"],riskPos:"lh",color:"var(--teal)"}
+];
+
+const riskColors={Low:"var(--green)",Medium:"var(--amber)",High:"var(--red)"};
+const dotColors=["var(--teal)","var(--blue)","var(--red)","var(--red)","var(--green)","var(--green)","var(--orange)","var(--green)","var(--amber)","var(--teal)"];
+
+// TABS
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+// RENDER INITIATIVES
+function renderInitiatives(){
+  const list=document.getElementById('initiatives-list');
+  list.innerHTML=initiatives.map(i=>`
+    <div class="init-row" data-id="${i.id}" onclick="this.classList.toggle('expanded')">
+      <div class="init-row-top">
+        <div class="init-drag">⠿</div>
+        <div><div class="init-name">${i.name}</div></div>
+        <div class="init-owner">${i.owner}</div>
+        <div class="init-status ${i.statusCls}">${i.statusLabel}</div>
+        <div><div class="init-progress"><div class="init-progress-fill" style="width:${i.progress}%;background:${i.riskColor}"></div></div><div style="font-size:10px;color:var(--muted);margin-top:2px;text-align:center" class="mono">${i.progress}%</div></div>
+        <div class="init-risk" style="color:${i.riskColor}">${i.risk}</div>
+        <div class="init-expand">▼</div>
+      </div>
+      <div class="init-detail"><div class="init-detail-inner">
+        <div class="detail-block"><div class="detail-label">Problem Statement</div><div class="detail-val">${i.problem}</div></div>
+        <div class="detail-block"><div class="detail-label">Next Action</div><div class="detail-val" style="color:var(--teal)">${i.next}</div></div>
+        <div class="detail-block"><div class="detail-label">Dependencies</div><div>${i.deps.map(d=>`<span class="dep-tag">${d}</span>`).join('')}</div></div>
+      </div></div>
+    </div>
+  `).join('');
+}
+
+// DASHBOARD STATUS CARDS
+function renderDashboard(){
+  const ontrack=initiatives.filter(i=>i.status==='on-track');
+  const atrisk=initiatives.filter(i=>i.status==='at-risk');
+  const blocked=initiatives.filter(i=>i.status==='blocked');
+  document.getElementById('dash-ontrack').innerHTML=ontrack.map(i=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>${i.name}</span><span class="mono" style="color:var(--green);font-size:11px">${i.progress}%</span></div>`).join('');
+  document.getElementById('dash-atrisk').innerHTML=atrisk.map(i=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>${i.name}</span><span class="mono" style="color:var(--amber);font-size:11px">${i.progress}%</span></div>`).join('');
+  document.getElementById('dash-blocked').innerHTML=blocked.map(i=>`<div style="font-size:12px;padding:4px 0;display:flex;justify-content:space-between"><span>${i.name}</span><span class="mono" style="color:var(--red);font-size:11px">${i.progress}%</span></div>`).join('');
+}
+
+// RISK MATRIX
+function renderRiskMatrix(){
+  const cells={ll:[],lm:[],lh:[],ml:[],mm:[],mh:[],hl:[],hm:[],hh:[]};
+  initiatives.forEach(i=>{cells[i.riskPos].push(i);});
+  Object.keys(cells).forEach(k=>{
+    const el=document.getElementById('rm-'+k);
+    el.innerHTML=cells[k].map(i=>`<div class="risk-dot" style="background:${i.color}" title="${i.name}">${i.id}</div>`).join('');
+  });
+}
+
+// AI INTAKE
+document.getElementById('intake-submit').addEventListener('click',()=>{
+  const title=document.getElementById('intake-title').value.trim();
+  const desc=document.getElementById('intake-desc').value.trim();
+  const sponsor=document.getElementById('intake-sponsor').value.trim();
+  const team=document.getElementById('intake-team').value;
+  if(!title){document.getElementById('intake-title').style.borderColor='var(--red)';return;}
+  document.getElementById('intake-title').style.borderColor='var(--border)';
+
+  const hasAI=desc.toLowerCase().includes('ai')||desc.toLowerCase().includes('automat');
+  const hasRevenue=desc.toLowerCase().includes('revenue')||desc.toLowerCase().includes('sales')||desc.toLowerCase().includes('growth');
+  const hasCustomer=desc.toLowerCase().includes('customer')||desc.toLowerCase().includes('user')||desc.toLowerCase().includes('client');
+  const hasMigration=desc.toLowerCase().includes('migrat')||desc.toLowerCase().includes('legacy')||desc.toLowerCase().includes('replac');
+  const hasCompliance=desc.toLowerCase().includes('compliance')||desc.toLowerCase().includes('audit')||desc.toLowerCase().includes('security');
+
+  let priority='P2 — Important';let pColor='var(--amber)';
+  if(hasRevenue||hasCustomer){priority='P1 — Critical';pColor='var(--red)';}
+  if(hasCompliance){priority='P1 — Critical';pColor='var(--red)';}
+  if(hasAI&&hasRevenue){priority='P0 — Urgent';pColor='var(--red)';}
+
+  let alignment='Medium';let aColor='var(--amber)';
+  if(hasRevenue){alignment='High — Revenue Impact';aColor='var(--green)';}
+  if(hasCustomer){alignment='High — Customer Impact';aColor='var(--green)';}
+  if(hasAI){alignment='High — AI-First Strategy';aColor='var(--green)';}
+  if(!hasRevenue&&!hasCustomer&&!hasAI&&!hasCompliance){alignment='Medium — Operational';aColor='var(--amber)';}
+
+  let effort=desc.length>100?'Large (8-12 weeks)':'Medium (4-6 weeks)';
+  if(hasMigration)effort='XL (12-16 weeks)';
+  let eColor=effort.includes('XL')?'var(--red)':effort.includes('Large')?'var(--amber)':'var(--teal)';
+
+  let risk='Medium';let rkColor='var(--amber)';
+  if(hasMigration){risk='High';rkColor='var(--red)';}
+  if(hasCompliance){risk='Medium-High';rkColor='var(--amber)';}
+
+  const capMap={Engineering:88,Product:72,Design:55,Marketing:64,Operations:41,'Cross-functional':70};
+  const cap=capMap[team]||60;
+  let capText=cap>80?`⚠ ${team} at ${cap}% — sequencing risk`:`✓ ${team} at ${cap}% — capacity available`;
+  let capColor=cap>80?'var(--red)':'var(--green)';
+
+  let sequence=cap>80?'Q3 Week 1 (capacity constrained)':'Q2 — Ready to kick off';
+  if(hasMigration)sequence='Q3 — Requires dedicated planning phase';
+
+  document.getElementById('r-priority').innerHTML=`<span style="color:${pColor}">${priority}</span>`;
+  document.getElementById('r-alignment').innerHTML=`<span style="color:${aColor}">${alignment}</span>`;
+  document.getElementById('r-effort').innerHTML=`<span style="color:${eColor}">${effort}</span>`;
+  document.getElementById('r-risk').innerHTML=`<span style="color:${rkColor}">${risk}</span>`;
+  document.getElementById('r-capacity').innerHTML=`<span style="color:${capColor}">${capText}</span>`;
+  document.getElementById('r-sequence').innerHTML=`<span>${sequence}</span>`;
+  document.getElementById('r-deps').innerHTML=`<span>${team}${hasAI?', Data, Security':''}, PMO</span>`;
+
+  let callout=`<div style="flex-shrink:0">&#x1F4A1;</div><div><strong>Recommendation:</strong> `;
+  if(cap>80)callout+=`${team} capacity is the constraint. Either defer to Q3 or trade against an existing Q2 commitment. Suggest reviewing ${initiatives[8].name} as a candidate for deferral.`;
+  else if(priority.includes('P0')||priority.includes('P1'))callout+=`This initiative scores as ${priority} with ${alignment.toLowerCase()}. Recommend immediate scoping session with ${sponsor||'executive sponsor'} to define MVP scope and success metrics before committing resources.`;
+  else callout+=`Standard priority. Add to Q2 backlog and sequence during next bi-weekly portfolio review. No immediate action required.`;
+  callout+='</div>';
+  document.getElementById('r-callout').innerHTML=callout;
+
+  document.getElementById('intake-result').classList.add('show');
+  document.getElementById('intake-hint').style.display='none';
+});
+
+// DRAG TO REORDER
+let dragEl=null;
+function enableDrag(){
+  document.querySelectorAll('.init-row').forEach(row=>{
+    row.setAttribute('draggable','true');
+    row.addEventListener('dragstart',e=>{dragEl=row;row.style.opacity='0.4';});
+    row.addEventListener('dragend',()=>{dragEl.style.opacity='1';dragEl=null;});
+    row.addEventListener('dragover',e=>{e.preventDefault();});
+    row.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragEl&&dragEl!==row){
+        const list=row.parentNode;
+        const children=[...list.children];
+        const fromIdx=children.indexOf(dragEl);
+        const toIdx=children.indexOf(row);
+        if(fromIdx<toIdx)row.after(dragEl);else row.before(dragEl);
+      }
+    });
+  });
+}
+
+// INIT
+renderInitiatives();
+renderDashboard();
+renderRiskMatrix();
+setTimeout(enableDrag,100);
+</script>
+</body>
+</html>
