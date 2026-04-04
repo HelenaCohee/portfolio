@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&C AI Portfolio Dashboard — Avalara</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#08090C;--card:#12141B;--card2:#1A1D27;--card3:#22252F;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--text:#E8E9ED;--muted:#6B6F7B;--dim:#484B55;--orange:#F97316;--orange-dim:rgba(249,115,22,0.1);--green:#22C55E;--green-dim:rgba(34,197,94,0.08);--amber:#FBBF24;--amber-dim:rgba(251,191,36,0.08);--red:#EF4444;--red-dim:rgba(239,68,68,0.08);--blue:#3B82F6;--blue-dim:rgba(59,130,246,0.08);--purple:#A78BFA;--purple-dim:rgba(167,139,250,0.08);--cyan:#06B6D4;--cyan-dim:rgba(6,182,212,0.08)}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* HEADER */
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.logo-group{display:flex;align-items:center;gap:12px}
+.logo{font-size:17px;font-weight:800;color:var(--orange);letter-spacing:2px}
+.logo-divider{width:1px;height:16px;background:var(--border2)}
+.logo-sub{font-size:12px;color:var(--muted);font-weight:500}
+.header-badges{display:flex;gap:6px}
+.badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+.badge-o{background:var(--orange-dim);color:var(--orange)}.badge-g{background:var(--green-dim);color:var(--green)}
+
+/* NAV TABS */
+.nav-tabs{display:flex;gap:0;background:var(--card);border-bottom:1px solid var(--border);padding:0 32px;position:sticky;top:49px;z-index:99}
+.nav-tab{padding:10px 20px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+
+.container{max-width:1240px;margin:0 auto;padding:24px 32px 80px}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* HERO */
+.hero{margin-bottom:20px;padding:24px 0}
+.hero-eyebrow{font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.hero h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;background:linear-gradient(135deg,var(--text),var(--muted));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:var(--muted);max-width:600px}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:all 0.3s;cursor:default}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi-n{font-size:30px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}
+.kpi-l{font-size:10px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* SECTION LABEL */
+.sec-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;margin-top:24px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.3s}
+.card:hover{border-color:var(--border2)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+/* LIFECYCLE */
+.lifecycle{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.lc-stage{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.lc-stage::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:height 0.3s}
+.lc-stage:hover::before{height:5px}
+.lc-stage.active{border-color:var(--border2);background:var(--card2)}
+.lc-stage.active::before{height:5px}
+.lc-stage.s1::before{background:var(--blue)}.lc-stage.s2::before{background:var(--cyan)}.lc-stage.s3::before{background:var(--orange)}.lc-stage.s4::before{background:var(--purple)}.lc-stage.s5::before{background:var(--red)}
+.lc-name{font-size:11px;font-weight:700;margin-bottom:4px}.lc-count{font-size:24px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}.lc-sub{font-size:9px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* FILTER PILLS */
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all 0.2s;background:transparent}
+.filter-pill:hover{border-color:var(--border2);color:var(--text)}
+.filter-pill.active{background:var(--orange-dim);border-color:var(--orange);color:var(--orange)}
+
+/* INITIATIVES */
+.initiative{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;transition:all 0.3s;cursor:pointer;overflow:hidden}
+.initiative:hover{border-color:var(--border2)}
+.initiative.expanded{background:var(--card3)}
+.init-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.init-name{font-size:13px;font-weight:700}
+.init-stage{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px}
+.stage-live{background:var(--green-dim);color:var(--green)}.stage-pilot{background:var(--amber-dim);color:var(--amber)}.stage-mvp{background:var(--blue-dim);color:var(--blue)}.stage-discovery{background:var(--purple-dim);color:var(--purple)}.stage-sunset{background:var(--red-dim);color:var(--red)}
+.init-meta{font-size:11px;color:var(--muted);margin-bottom:8px}
+.init-metrics{display:flex;gap:16px}
+.im{text-align:center}.im-n{font-size:17px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}.im-l{font-size:9px;color:var(--muted);margin-top:3px}
+.init-detail{max-height:0;overflow:hidden;transition:max-height 0.4s ease;font-size:12px;color:var(--muted);line-height:1.7}
+.initiative.expanded .init-detail{max-height:200px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+
+/* BARS */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:12px;color:var(--muted);width:140px;flex-shrink:0}
+.bar-track{flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.4s cubic-bezier(.25,.46,.45,.94)}
+.bar-val{font-size:12px;font-weight:700;width:40px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+/* CALLOUTS */
+.callout{padding:12px 16px;border-radius:10px;margin-top:10px;display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.6}
+.callout strong{font-weight:600;color:var(--text)}
+.callout.insight{background:var(--orange-dim);border:1px solid rgba(249,115,22,0.15)}
+.callout.warning{background:var(--amber-dim);border:1px solid rgba(251,191,36,0.15)}
+.callout.success{background:var(--green-dim);border:1px solid rgba(34,197,94,0.15)}
+
+/* AI CHAT */
+.chat-container{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.chat-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.chat-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.chat-title{font-size:13px;font-weight:700}.chat-sub{font-size:11px;color:var(--muted)}
+.chat-messages{padding:16px 18px;height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:12.5px;line-height:1.6;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{background:var(--card2);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--orange-dim);border:1px solid rgba(249,115,22,0.2);align-self:flex-end;border-bottom-right-radius:4px;color:var(--orange)}
+.msg .typing{display:inline-flex;gap:4px}.msg .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingDot 1.4s infinite}
+.msg .typing span:nth-child(2){animation-delay:0.2s}.msg .typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typingDot{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-input-area{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.chat-input:focus{border-color:var(--orange)}
+.chat-input::placeholder{color:var(--dim)}
+.chat-send{background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.chat-send:hover{opacity:0.85}
+.suggested-q{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sq{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:100px;color:var(--muted);cursor:pointer;transition:all 0.2s;background:transparent}
+.sq:hover{border-color:var(--orange);color:var(--orange)}
+
+/* RECO CARDS */
+.reco-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all 0.3s}
+.reco-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.reco-n{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.reco-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.reco-title em{color:var(--orange);font-style:normal}
+.reco-body{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* REAL DATA BADGE */
+.data-source{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--dim);background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:4px;margin-top:4px}
+.data-source::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--green)}
+
+/* FOOTER */
+.footer{text-align:center;padding:32px;font-size:11px;color:var(--dim);border-top:1px solid var(--border);margin-top:32px}
+.footer a{color:var(--orange);text-decoration:none}
+
+@media(max-width:768px){.kpi-row,.lifecycle,.grid-2,.grid-3{grid-template-columns:1fr}.container{padding:20px 16px}.nav-tabs{overflow-x:auto}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-group">
+    <span class="logo">AVALARA</span>
+    <div class="logo-divider"></div>
+    <span class="logo-sub">People & Culture AI Portfolio</span>
+  </div>
+  <div class="header-badges">
+    <span class="badge badge-o">Q2 2026</span>
+    <span class="badge badge-g">&#x25CF; AI-First</span>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <div class="nav-tab active" data-tab="portfolio">Portfolio</div>
+  <div class="nav-tab" data-tab="agent">AI Agent Simulator</div>
+  <div class="nav-tab" data-tab="adoption">Adoption & Governance</div>
+  <div class="nav-tab" data-tab="roadmap">90-Day Plan</div>
+</div>
+
+<div class="container">
+
+<!-- ═══ TAB 1: PORTFOLIO ═══ -->
+<div class="tab-content active" id="tab-portfolio">
+  <div class="hero">
+    <div class="hero-eyebrow">P&C AI Operating System</div>
+    <h1>From experiments to embedded workflows</h1>
+    <p>A portfolio view of every AI initiative across People & Culture — mapped to the employee lifecycle, governed with lightweight process, measured by outcomes.</p>
+    <div class="data-source">Built with public Avalara data &middot; ~5,000 employees &middot; $1B+ revenue &middot; AI Fridays program active</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-n" style="color:var(--orange)">12</div><div class="kpi-l">Active Initiatives</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--green)">4</div><div class="kpi-l">In Production</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--green)">42%</div><div class="kpi-l">Ticket Deflection</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--green)">4.3</div><div class="kpi-l">Agent CSAT</div></div>
+    <div class="kpi"><div class="kpi-n" style="color:var(--amber)">~1,200</div><div class="kpi-l">Hrs Saved / Quarter</div></div>
+  </div>
+
+  <div class="sec-label">Employee Lifecycle Coverage <span style="font-weight:400;color:var(--dim)">&mdash; click to filter</span></div>
+  <div class="lifecycle" id="lifecycle-filter">
+    <div class="lc-stage s1 active" data-stage="onboarding"><div class="lc-name">Onboarding</div><div class="lc-count" style="color:var(--blue)">3</div><div class="lc-sub">Offer → Day 90</div></div>
+    <div class="lc-stage s2 active" data-stage="performance"><div class="lc-name">Performance</div><div class="lc-count" style="color:var(--cyan)">3</div><div class="lc-sub">Goals & Reviews</div></div>
+    <div class="lc-stage s3 active" data-stage="engagement"><div class="lc-name">Engagement</div><div class="lc-count" style="color:var(--orange)">2</div><div class="lc-sub">Pulse & Culture</div></div>
+    <div class="lc-stage s4 active" data-stage="manager"><div class="lc-name">Manager Tools</div><div class="lc-count" style="color:var(--purple)">2</div><div class="lc-sub">Coaching & Ops</div></div>
+    <div class="lc-stage s5 active" data-stage="exits"><div class="lc-name">Exits & Ops</div><div class="lc-count" style="color:var(--red)">2</div><div class="lc-sub">Offboard & Ops</div></div>
+  </div>
+
+  <div class="sec-label">Status Filter</div>
+  <div class="filter-bar" id="status-filter">
+    <div class="filter-pill active" data-status="all">All (12)</div>
+    <div class="filter-pill" data-status="live">&#x25CF; Live (4)</div>
+    <div class="filter-pill" data-status="pilot">Pilot (3)</div>
+    <div class="filter-pill" data-status="mvp">MVP (2)</div>
+    <div class="filter-pill" data-status="discovery">Discovery (2)</div>
+    <div class="filter-pill" data-status="sunset">Sunset (1)</div>
+  </div>
+
+  <div id="initiatives-list">
+    <!-- Populated by JS -->
+  </div>
+</div>
+
+<!-- ═══ TAB 2: AI AGENT SIMULATOR ═══ -->
+<div class="tab-content" id="tab-agent">
+  <div class="hero">
+    <div class="hero-eyebrow">P&C Primary Agent &mdash; Prototype</div>
+    <h1>Ask the agent anything</h1>
+    <p>A simulation of Avalara's P&C AI agent — the product this role owns. Try asking about PTO, onboarding, benefits, performance reviews, or company policies.</p>
+    <div class="data-source">Simulated responses based on public Avalara benefits, culture, and policy data</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-dot"></div>
+        <div><div class="chat-title">P&C AI Agent</div><div class="chat-sub">Powered by Glean &middot; 12 policy domains &middot; ~5,000 employees served</div></div>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg bot">Hi! I'm the P&C AI Agent. I can help with benefits, PTO, onboarding, performance reviews, and more. What can I help you with?</div>
+      </div>
+      <div class="chat-input-area">
+        <input class="chat-input" id="chat-input" placeholder="Ask a P&C question..." autocomplete="off">
+        <button class="chat-send" id="chat-send">Send</button>
+      </div>
+      <div style="padding:8px 18px 14px">
+        <div class="suggested-q" id="suggested-q">
+          <div class="sq" data-q="How much PTO do I get?">PTO policy</div>
+          <div class="sq" data-q="What are my health insurance options?">Health benefits</div>
+          <div class="sq" data-q="How does performance review work?">Perf reviews</div>
+          <div class="sq" data-q="I'm a new hire. What should I do in my first week?">New hire help</div>
+          <div class="sq" data-q="What is AI Fridays?">AI Fridays</div>
+          <div class="sq" data-q="How do I submit a ticket to P&C?">Submit a ticket</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Agent Performance Metrics</div>
+      <div class="card-sub">Real-time monitoring dashboard for the agent this role owns</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">42%</div><div style="font-size:10px;color:var(--muted)">Ticket Deflection</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">4.3/5</div><div style="font-size:10px;color:var(--muted)">CSAT Score</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--amber)">87%</div><div style="font-size:10px;color:var(--muted)">Accuracy Rate</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">&lt;8s</div><div style="font-size:10px;color:var(--muted)">Avg Response Time</div></div>
+      </div>
+      <div class="sec-label" style="margin-top:16px">Deflection by Domain</div>
+      <div class="bar-row"><div class="bar-label">Benefits & Leave</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="68"></div></div><div class="bar-val" style="color:var(--green)">68%</div></div>
+      <div class="bar-row"><div class="bar-label">IT & Access</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="55"></div></div><div class="bar-val" style="color:var(--green)">55%</div></div>
+      <div class="bar-row"><div class="bar-label">Onboarding</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="47"></div></div><div class="bar-val" style="color:var(--amber)">47%</div></div>
+      <div class="bar-row"><div class="bar-label">Performance</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="38"></div></div><div class="bar-val" style="color:var(--amber)">38%</div></div>
+      <div class="bar-row"><div class="bar-label">Comp & Payroll</div><div class="bar-track"><div class="bar-fill" style="background:var(--red)" data-w="22"></div></div><div class="bar-val" style="color:var(--red)">22%</div></div>
+      <div class="bar-row"><div class="bar-label">ER & Policy</div><div class="bar-track"><div class="bar-fill" style="background:var(--red)" data-w="15"></div></div><div class="bar-val" style="color:var(--red)">15%</div></div>
+      <div class="callout insight" style="margin-top:8px">
+        <div style="flex-shrink:0">&#x1F50D;</div>
+        <div><strong>Comp/Payroll and ER have the lowest deflection</strong> — these require human judgment. The agent should identify and escalate these quickly, not attempt to resolve. Improving escalation logic here will raise CSAT without needing accuracy improvements.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 3: ADOPTION ═══ -->
+<div class="tab-content" id="tab-adoption">
+  <div class="hero">
+    <div class="hero-eyebrow">Adoption & Governance</div>
+    <h1>Who's using it. Who's not. Why.</h1>
+    <p>Adoption by role, governance health, and the constraint that needs to be solved.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">AI Tool Adoption by Role</div>
+      <div class="card-sub">% using P&C AI tools weekly across ~5,000 employees</div>
+      <div class="bar-row"><div class="bar-label">P&C Team</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="82"></div></div><div class="bar-val" style="color:var(--green)">82%</div></div>
+      <div class="bar-row"><div class="bar-label">People Partners</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="74"></div></div><div class="bar-val" style="color:var(--green)">74%</div></div>
+      <div class="bar-row"><div class="bar-label">New Hires (0-90d)</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="78"></div></div><div class="bar-val" style="color:var(--green)">78%</div></div>
+      <div class="bar-row"><div class="bar-label">All Employees</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="63"></div></div><div class="bar-val" style="color:var(--amber)">63%</div></div>
+      <div class="bar-row"><div class="bar-label">Managers</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="51"></div></div><div class="bar-val" style="color:var(--amber)">51%</div></div>
+      <div class="bar-row"><div class="bar-label">AI Friday Participants</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="89"></div></div><div class="bar-val" style="color:var(--green)">89%</div></div>
+      <div class="callout warning" style="margin-top:8px">
+        <div style="flex-shrink:0">&#x26A0;</div>
+        <div><strong>Manager adoption at 51% is the constraint.</strong> Employees ask the agent questions. Managers need the agent for goal-setting, feedback drafting, and performance reviews — different use cases that require different prompt architecture and enablement.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Governance Health</div>
+      <div class="card-sub">Portfolio governance across 12 active initiatives</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:20px;font-weight:800;color:var(--green)">12/12</div><div style="font-size:10px;color:var(--muted)">Risk reviews done</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:20px;font-weight:800;color:var(--green)">100%</div><div style="font-size:10px;color:var(--muted)">Data handling OK</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:20px;font-weight:800;color:var(--amber)">8/12</div><div style="font-size:10px;color:var(--muted)">Content governance</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:20px;font-weight:800;color:var(--green)">Bi-weekly</div><div style="font-size:10px;color:var(--muted)">Portfolio cadence</div></div>
+      </div>
+      <div class="callout success">
+        <div style="flex-shrink:0">&#x2713;</div>
+        <div><strong>All initiatives have completed risk review.</strong> Content governance is the gap — 4 initiatives need updated prompt governance docs before scaling beyond pilot. Aligned to Avalara's OPAH value of Ownership: every initiative has a clear owner, risk profile, and success metric.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 4: ROADMAP ═══ -->
+<div class="tab-content" id="tab-roadmap">
+  <div class="hero">
+    <div class="hero-eyebrow">First 90 Days</div>
+    <h1>Map. Ship. Sustain.</h1>
+    <p>A phased plan for turning Avalara's AI-first P&C ambition into an operating system that scales.</p>
+  </div>
+  <div class="grid-3">
+    <div class="reco-card"><div class="reco-n">Month 1</div><div class="reco-title"><em>Map & prioritize</em></div><div class="reco-body">Audit every AI initiative in flight across P&C. Interview stakeholders. Build the portfolio view. Deliver a prioritized roadmap to the Senior Director, People Operations — sequenced against engineering capacity and aligned to Avalara's AI-first mandate.</div></div>
+    <div class="reco-card"><div class="reco-n">Month 2</div><div class="reco-title"><em>Ship one visible win</em></div><div class="reco-body">Pick the use case with the clearest problem statement and most measurable outcome. Build the MVP, pilot with a controlled group, instrument it, show the numbers. One visible win — like improving primary agent deflection from 42% to 50% — builds more credibility than a strategy deck.</div></div>
+    <div class="reco-card"><div class="reco-n">Month 3</div><div class="reco-title"><em>Governance + enablement</em></div><div class="reco-body">Launch lightweight governance (bi-weekly portfolio reviews, risk cadence, content governance). Deploy the first manager-facing adoption playbook. Start office hours. Train the 5–8 champions who will sustain AI adoption after the initial momentum fades — aligned to the AI Fridays community.</div></div>
+  </div>
+  <div class="callout insight" style="margin-top:16px">
+    <div style="flex-shrink:0">&#x1F4A1;</div>
+    <div><strong>The AI Fridays program is the launchpad.</strong> Avalara already has a weekly habit of AI experimentation. The 90-day plan doesn't create a new behavior — it channels an existing one into structured, measurable P&C outcomes. That's the difference between adoption and transformation.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  Built by <a href="https://helenacohee.github.io/portfolio/">Helena Cohee</a> &middot; Prototype for Avalara P&C AI &middot; Sample data informed by public Avalara information &middot; <a href="https://linkedin.com/in/helenabcohee">LinkedIn</a>
+</div>
+
+<script>
+// ═══ DATA ═══
+const initiatives = [
+  {name:"P&C Primary Agent (Glean)",stage:"live",lifecycle:"onboarding",meta:"Employee-facing · Ticket deflection · All lifecycle stages",metrics:[{n:"42%",l:"Deflection",c:"var(--green)"},{n:"4.3",l:"CSAT",c:"var(--green)"},{n:"87%",l:"Accuracy",c:"var(--amber)"}],detail:"Serves ~5,000 employees across 12 policy domains. Integrated with Glean for knowledge retrieval. Current focus: improving escalation logic for complex ER and comp queries to reduce false confidence responses."},
+  {name:"Onboarding Workflow Agent",stage:"pilot",lifecycle:"onboarding",meta:"New hire journey · ServiceNow + Workday · Offer → Day 30",metrics:[{n:"-2d",l:"Ramp time",c:"var(--amber)"},{n:"91%",l:"Task completion",c:"var(--green)"},{n:"N=45",l:"Pilot size",c:"var(--blue)"}],detail:"Automates provisioning checklist, welcome comms, and Day 1 readiness across ServiceNow and Workday. Pilot running with Durham office hires. Targeting full rollout Q3."},
+  {name:"New Hire Q&A Sub-Agent",stage:"live",lifecycle:"onboarding",meta:"First 90 days · Benefits, IT, culture questions · Slack-native",metrics:[{n:"78%",l:"New hire adoption",c:"var(--green)"},{n:"4.6",l:"CSAT",c:"var(--green)"},{n:"340",l:"Queries/month",c:"var(--blue)"}],detail:"Handles the most common new hire questions: benefits enrollment deadlines, IT setup, parking, ERG info. Highest CSAT of any sub-agent because scope is narrow and answers are concrete."},
+  {name:"Manager Goal-Setting Coach",stage:"mvp",lifecycle:"performance",meta:"Manager-facing · Performance cycle · Workday integration",metrics:[{n:"v0.2",l:"Version",c:"var(--blue)"},{n:"68%",l:"Quality score",c:"var(--amber)"},{n:"Q3",l:"Target pilot",c:"var(--purple)"}],detail:"Helps managers write SMART goals aligned to company OKRs. Current quality score reflects prompt architecture limitations — rebuilding with Workday context injection for Q3 pilot."},
+  {name:"Performance Review Draft Assistant",stage:"sunset",lifecycle:"performance",meta:"Low adoption (18%) · Recommend: rebuild with agentic architecture",metrics:[{n:"18%",l:"Adoption",c:"var(--red)"},{n:"3.1",l:"CSAT",c:"var(--red)"},{n:"—",l:"Sunset Q2",c:"var(--dim)"}],detail:"Original prompt-based approach didn't account for manager context or Workday data. Sunsetting and rebuilding as part of the Manager Goal-Setting Coach with agentic flows."},
+  {name:"Calibration Prep Summarizer",stage:"pilot",lifecycle:"performance",meta:"P&C internal · Review cycle prep · n8n workflow",metrics:[{n:"6hrs",l:"Saved/cycle",c:"var(--green)"},{n:"92%",l:"Accuracy",c:"var(--green)"},{n:"N=12",l:"P&C users",c:"var(--blue)"}],detail:"Summarizes performance data, peer feedback, and manager notes into a calibration prep doc. Used by People Partners before calibration sessions. n8n workflow pulls from Workday + survey data."},
+  {name:"Engagement Pulse Agent",stage:"discovery",lifecycle:"engagement",meta:"Post-survey nudges · Slack-native · Manager coaching prompts",metrics:[{n:"—",l:"Discovery",c:"var(--dim)"},{n:"—",l:"Q3 target",c:"var(--dim)"},{n:"—",l:"Scoping",c:"var(--dim)"}],detail:"Concept: after engagement survey results drop, automatically send managers coaching prompts with specific action suggestions based on their team's lowest-scoring dimensions."},
+  {name:"ERG Event & Comms Coordinator",stage:"live",lifecycle:"engagement",meta:"8 ERGs · Event scheduling · Comms automation",metrics:[{n:"8",l:"ERGs served",c:"var(--orange)"},{n:"3x",l:"Event frequency",c:"var(--green)"},{n:"85%",l:"Comms open rate",c:"var(--green)"}],detail:"Automates event scheduling, reminder comms, and post-event feedback collection for all 8 Avalara ERGs (Access, HOLA, Prism, Ujima, VOA, WOA, and others). Freed ~4 hrs/week of manual coordination."},
+  {name:"Manager Escalation Router",stage:"mvp",lifecycle:"manager",meta:"ER triage · Escalation logic · Legal/compliance routing",metrics:[{n:"v0.1",l:"Version",c:"var(--blue)"},{n:"—",l:"In design",c:"var(--dim)"},{n:"Q3",l:"Target pilot",c:"var(--purple)"}],detail:"Routes manager-reported issues to the right P&C specialist based on issue type, severity, and compliance requirements. Designed to reduce time-to-first-response for sensitive ER matters."},
+  {name:"1:1 Prep Assistant",stage:"pilot",lifecycle:"manager",meta:"Manager-facing · Agenda generation · Workday + Slack context",metrics:[{n:"61%",l:"Manager adoption",c:"var(--amber)"},{n:"4.1",l:"CSAT",c:"var(--green)"},{n:"N=30",l:"Pilot size",c:"var(--blue)"}],detail:"Generates 1:1 agenda suggestions based on recent Slack activity, Workday goals, and upcoming deadlines. Pilot with engineering managers. Higher adoption than other manager tools because it solves an immediate, weekly pain point."},
+  {name:"Exit Interview Summarizer",stage:"discovery",lifecycle:"exits",meta:"P&C Ops · n8n workflow · Theme extraction + alerts",metrics:[{n:"—",l:"Discovery",c:"var(--dim)"},{n:"—",l:"Q3 target",c:"var(--dim)"},{n:"—",l:"Scoping",c:"var(--dim)"}],detail:"Concept: automatically transcribe and summarize exit interviews, extract themes, and alert P&C leadership when attrition patterns emerge in specific teams or regions."},
+  {name:"Policy Q&A Sub-Agent",stage:"live",lifecycle:"exits",meta:"Benefits, leave, compliance · Glean sub-agent · 12 policy domains",metrics:[{n:"68%",l:"Deflection",c:"var(--green)"},{n:"4.4",l:"CSAT",c:"var(--green)"},{n:"520",l:"Queries/month",c:"var(--blue)"}],detail:"Highest-volume sub-agent. Handles benefits enrollment, leave policies, compliance questions. Integrated with Avalara's policy knowledge base via Glean. Deflection rate is highest in Benefits & Leave domain."}
+];
+
+const stageMap = {live:'stage-live',pilot:'stage-pilot',mvp:'stage-mvp',discovery:'stage-discovery',sunset:'stage-sunset'};
+
+// ═══ RENDER INITIATIVES ═══
+let activeLifecycles = new Set(['onboarding','performance','engagement','manager','exits']);
+let activeStatus = 'all';
+
+function renderInitiatives(){
+  const list = document.getElementById('initiatives-list');
+  const filtered = initiatives.filter(i => {
+    const lcMatch = activeLifecycles.has(i.lifecycle);
+    const stMatch = activeStatus === 'all' || i.stage === activeStatus;
+    return lcMatch && stMatch;
+  });
+  list.innerHTML = filtered.map((i,idx) => `
+    <div class="initiative" onclick="this.classList.toggle('expanded')">
+      <div class="init-header"><div class="init-name">${i.name}</div><div class="init-stage ${stageMap[i.stage]}">${i.stage}</div></div>
+      <div class="init-meta">${i.meta}</div>
+      <div class="init-metrics">${i.metrics.map(m=>`<div class="im"><div class="im-n mono" style="color:${m.c}">${m.n}</div><div class="im-l">${m.l}</div></div>`).join('')}</div>
+      <div class="init-detail">${i.detail}</div>
+    </div>
+  `).join('');
+  if(filtered.length===0) list.innerHTML='<div style="text-align:center;padding:40px;color:var(--dim)">No initiatives match current filters</div>';
+}
+
+// ═══ LIFECYCLE FILTER ═══
+document.querySelectorAll('.lc-stage').forEach(el => {
+  el.addEventListener('click', () => {
+    el.classList.toggle('active');
+    const stage = el.dataset.stage;
+    if(activeLifecycles.has(stage)) activeLifecycles.delete(stage); else activeLifecycles.add(stage);
+    renderInitiatives();
+  });
+});
+
+// ═══ STATUS FILTER ═══
+document.querySelectorAll('.filter-pill').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    activeStatus = el.dataset.status;
+    renderInitiatives();
+  });
+});
+
+// ═══ TABS ═══
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    setTimeout(animateBars, 100);
+  });
+});
+
+// ═══ AI CHAT SIMULATOR ═══
+const responses = {
+  'pto':['Avalara offers generous paid time off! Full-time US employees receive up to 20 days of PTO annually, plus 11 paid holidays. PTO accrues from your start date and can be used for vacation, personal time, or sick days. You can check your current balance in Workday under Time Off > My Balances.','I can also help you submit a time-off request if you\'d like — just let me know the dates!'],
+  'health':['Avalara provides comprehensive health benefits including medical, dental, and vision insurance. Coverage options vary by location but generally include multiple plan tiers so you can choose what fits your needs. Benefits also include life insurance, disability coverage, and flexible spending accounts.','For specific plan details and enrollment deadlines, I\'d recommend checking the Benefits Hub in Workday or reaching out to benefits@avalara.com. Would you like me to create a ticket for the benefits team?'],
+  'performance':['Performance reviews at Avalara follow an annual cycle with mid-year check-ins. The process includes self-assessment, manager review, peer feedback, and calibration. Your manager will initiate the review in Workday, and you\'ll receive a notification when it\'s time to complete your self-assessment.','Goal-setting happens at the beginning of each cycle, aligned to your team\'s OKRs and Avalara\'s company priorities. Need help preparing for your next review? I can share some tips!'],
+  'newhire':['Welcome to Avalara! Your first week is designed to get you set up and connected. Here\'s what to expect:\n\n• Day 1: IT setup, security training, and team introductions\n• Day 2-3: Product orientation and role-specific onboarding\n• Day 4-5: Meet your onboarding buddy, attend your first AI Friday\n\nYour manager should have shared a 30/60/90 day plan with you. If not, let me know and I\'ll flag it.','Pro tip: Join at least one ERG in your first month — Avalara has 8 employee resource groups and they\'re a great way to build connections fast!'],
+  'aifridays':['AI Fridays is Avalara\'s weekly program where teams across the company explore and experiment with AI tools. Every Friday, employees get dedicated time to try new AI applications, share discoveries with their teams, and build AI fluency in a low-pressure environment.','The program is part of Avalara\'s AI-first commitment. Teams from Engineering to Sales to P&C all participate. It\'s a great way to discover practical AI applications for your daily work. Your manager can share your team\'s AI Friday schedule!'],
+  'ticket':['To submit a ticket to the People & Culture team, you have a few options:\n\n1. Ask me! I can handle many common requests directly\n2. Use the P&C portal in ServiceNow for complex requests\n3. Email people@avalara.com for sensitive matters\n\nFor ER-related concerns, please use the confidential intake form — I can share the link if needed.','What type of request do you need help with? I might be able to resolve it right here.'],
+  'default':['I want to make sure I get you the right answer. Could you tell me a bit more about what you\'re looking for? I can help with benefits, PTO, onboarding, performance reviews, company policies, ERGs, AI Fridays, and general P&C questions.','If this is a sensitive or complex matter, I can route you directly to a People Partner — just let me know.']
+};
+
+function getResponse(input){
+  const q = input.toLowerCase();
+  if(q.includes('pto')||q.includes('time off')||q.includes('vacation')||q.includes('holiday')) return responses.pto;
+  if(q.includes('health')||q.includes('insurance')||q.includes('benefit')||q.includes('dental')||q.includes('medical')||q.includes('vision')) return responses.health;
+  if(q.includes('performance')||q.includes('review')||q.includes('goal')||q.includes('feedback')) return responses.performance;
+  if(q.includes('new hire')||q.includes('first week')||q.includes('onboard')||q.includes('first day')||q.includes('just started')) return responses.newhire;
+  if(q.includes('ai friday')||q.includes('ai-first')) return responses.aifridays;
+  if(q.includes('ticket')||q.includes('submit')||q.includes('request')||q.includes('help desk')) return responses.ticket;
+  return responses.default;
+}
+
+function addMessage(text, type){
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg '+type;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping(){
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = 'typing-indicator';
+  div.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping(){
+  const el = document.getElementById('typing-indicator');
+  if(el) el.remove();
+}
+
+function handleChat(){
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if(!q) return;
+  addMessage(q, 'user');
+  input.value = '';
+  showTyping();
+  const resp = getResponse(q);
+  setTimeout(() => {
+    removeTyping();
+    addMessage(resp[0], 'bot');
+    if(resp[1]){
+      setTimeout(() => addMessage(resp[1], 'bot'), 800);
+    }
+  }, 1200);
+}
+
+document.getElementById('chat-send').addEventListener('click', handleChat);
+document.getElementById('chat-input').addEventListener('keypress', e => { if(e.key==='Enter') handleChat(); });
+document.querySelectorAll('.sq').forEach(el => {
+  el.addEventListener('click', () => {
+    document.getElementById('chat-input').value = el.dataset.q;
+    handleChat();
+  });
+});
+
+// ═══ ANIMATE BARS ═══
+function animateBars(){
+  document.querySelectorAll('.bar-fill').forEach(el => { el.style.width = (el.dataset.w||0)+'%'; });
+}
+
+// ═══ INIT ═══
+renderInitiatives();
+window.addEventListener('load', () => setTimeout(animateBars, 300));
+</script>
+</body>
+</html>
