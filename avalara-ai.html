@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&C AI Portfolio Dashboard — Avalara</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#08090C;--card:#12141B;--card2:#1A1D27;--card3:#22252F;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--text:#E8E9ED;--muted:#6B6F7B;--dim:#484B55;--orange:#F97316;--orange-dim:rgba(249,115,22,0.1);--green:#22C55E;--green-dim:rgba(34,197,94,0.08);--amber:#FBBF24;--amber-dim:rgba(251,191,36,0.08);--red:#EF4444;--red-dim:rgba(239,68,68,0.08);--blue:#3B82F6;--blue-dim:rgba(59,130,246,0.08);--purple:#A78BFA;--purple-dim:rgba(167,139,250,0.08);--cyan:#06B6D4;--cyan-dim:rgba(6,182,212,0.08)}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.logo-group{display:flex;align-items:center;gap:12px}
+.logo{font-size:17px;font-weight:800;color:var(--orange);letter-spacing:2px}
+.logo-divider{width:1px;height:16px;background:var(--border2)}
+.logo-sub{font-size:12px;color:var(--muted);font-weight:500}
+.header-badges{display:flex;gap:6px}
+.badge{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+.badge-o{background:var(--orange-dim);color:var(--orange)}.badge-g{background:var(--green-dim);color:var(--green)}
+.nav-tabs{display:flex;gap:0;background:var(--card);border-bottom:1px solid var(--border);padding:0 32px;position:sticky;top:49px;z-index:99;overflow-x:auto}
+.nav-tab{padding:10px 20px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.container{max-width:1240px;margin:0 auto;padding:24px 32px 80px}
+.tab-content{display:none}.tab-content.active{display:block}
+.hero{margin-bottom:20px;padding:20px 0}
+.hero-eyebrow{font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.hero h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;background:linear-gradient(135deg,var(--text),var(--muted));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:13px;color:var(--muted);max-width:600px}
+.data-source{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:var(--dim);background:rgba(255,255,255,0.03);padding:2px 8px;border-radius:4px;margin-top:6px}
+.data-source::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--green)}
+.sec-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;margin-top:24px;display:flex;align-items:center;gap:8px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.3s}
+.card:hover{border-color:var(--border2)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:8px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative}
+.kpi:hover{border-color:var(--border2);transform:translateY(-2px)}
+.kpi.active{border-color:var(--orange);background:var(--card2)}
+.kpi-n{font-size:30px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}
+.kpi-l{font-size:10px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.5px}
+.kpi-drill{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;display:none;animation:fadeIn 0.3s ease}
+.kpi-drill.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* LIFECYCLE */
+.lifecycle{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.lc-stage{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.lc-stage::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;transition:height 0.3s}
+.lc-stage:hover::before{height:5px}
+.lc-stage.active{border-color:var(--border2);background:var(--card2)}.lc-stage.active::before{height:5px}
+.lc-stage.s1::before{background:var(--blue)}.lc-stage.s2::before{background:var(--cyan)}.lc-stage.s3::before{background:var(--orange)}.lc-stage.s4::before{background:var(--purple)}.lc-stage.s5::before{background:var(--red)}
+.lc-name{font-size:11px;font-weight:700;margin-bottom:4px}.lc-count{font-size:24px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}.lc-sub{font-size:9px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* FILTERS */
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--muted);transition:all 0.2s;background:transparent}
+.filter-pill:hover{border-color:var(--border2);color:var(--text)}
+.filter-pill.active{background:var(--orange-dim);border-color:var(--orange);color:var(--orange)}
+
+/* INITIATIVES */
+.initiative{background:var(--card2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:all 0.3s;cursor:pointer;overflow:hidden}
+.initiative:hover{border-color:var(--border2)}
+.initiative.expanded{background:var(--card3);border-color:var(--border2)}
+.init-top{padding:14px}
+.init-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.init-name{font-size:13px;font-weight:700}
+.init-badges{display:flex;gap:4px;align-items:center}
+.init-stage{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px}
+.stage-live{background:var(--green-dim);color:var(--green)}.stage-pilot{background:var(--amber-dim);color:var(--amber)}.stage-mvp{background:var(--blue-dim);color:var(--blue)}.stage-discovery{background:var(--purple-dim);color:var(--purple)}.stage-sunset{background:var(--red-dim);color:var(--red)}
+.risk-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px}
+.risk-low{background:var(--green-dim);color:var(--green)}.risk-med{background:var(--amber-dim);color:var(--amber)}.risk-high{background:var(--red-dim);color:var(--red)}
+.init-meta{font-size:11px;color:var(--muted);margin-bottom:8px}
+.init-metrics{display:flex;gap:16px}
+.im{text-align:center}.im-n{font-size:17px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}.im-l{font-size:9px;color:var(--muted);margin-top:3px}
+.init-detail{max-height:0;overflow:hidden;transition:max-height 0.5s ease}
+.initiative.expanded .init-detail{max-height:500px}
+.init-detail-inner{padding:14px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.7}
+.detail-section{margin-bottom:10px}
+.detail-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.detail-text{color:var(--muted);line-height:1.6}
+.detail-action{color:var(--orange);font-weight:600}
+.progress-bar{width:100%;height:4px;background:rgba(255,255,255,0.04);border-radius:2px;margin:8px 0}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.8s ease}
+
+/* BARS */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:12px;color:var(--muted);width:140px;flex-shrink:0}
+.bar-track{flex:1;height:5px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.4s cubic-bezier(.25,.46,.45,.94)}
+.bar-val{font-size:12px;font-weight:700;width:40px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+/* CALLOUTS */
+.callout{padding:12px 16px;border-radius:10px;margin-top:10px;display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.6}
+.callout strong{font-weight:600;color:var(--text)}
+.callout.insight{background:var(--orange-dim);border:1px solid rgba(249,115,22,0.15)}
+.callout.warning{background:var(--amber-dim);border:1px solid rgba(251,191,36,0.15)}
+.callout.success{background:var(--green-dim);border:1px solid rgba(34,197,94,0.15)}
+
+/* SIMULATOR */
+.sim-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.sim-label{font-size:12px;color:var(--muted);width:160px;flex-shrink:0}
+.sim-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,0.08);outline:none}
+.sim-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid var(--bg)}
+.sim-val{font-size:14px;font-weight:700;width:50px;text-align:right;font-family:'JetBrains Mono',monospace}
+.sim-result{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;margin-top:12px}
+.sim-result-n{font-size:40px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--orange);line-height:1}
+.sim-result-l{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* CHAT */
+.chat-container{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.chat-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.chat-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.chat-title{font-size:13px;font-weight:700}.chat-sub{font-size:11px;color:var(--muted)}
+.chat-messages{padding:16px 18px;height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:12.5px;line-height:1.6;animation:fadeIn 0.3s ease}
+.msg.bot{background:var(--card2);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--orange-dim);border:1px solid rgba(249,115,22,0.2);align-self:flex-end;border-bottom-right-radius:4px;color:var(--orange)}
+.msg .typing{display:inline-flex;gap:4px}.msg .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typingDot 1.4s infinite}
+.msg .typing span:nth-child(2){animation-delay:0.2s}.msg .typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typingDot{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-input-area{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px}
+.chat-input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.chat-input:focus{border-color:var(--orange)}
+.chat-input::placeholder{color:var(--dim)}
+.chat-send{background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.chat-send:hover{opacity:0.85}
+.suggested-q{display:flex;gap:6px;flex-wrap:wrap;padding:8px 18px 14px}
+.sq{font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:100px;color:var(--muted);cursor:pointer;transition:all 0.2s;background:transparent}
+.sq:hover{border-color:var(--orange);color:var(--orange)}
+
+/* GOVERNANCE CHECKLIST */
+.gov-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.2s}
+.gov-item:hover{border-color:var(--border2)}
+.gov-item.checked{border-color:var(--green);background:var(--green-dim)}
+.gov-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--dim);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s;flex-shrink:0}
+.gov-item.checked .gov-check{border-color:var(--green);background:var(--green);color:var(--bg)}
+.gov-text{font-size:12px;flex:1}.gov-status{font-size:10px;font-weight:600}
+
+/* RECO */
+.reco-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all 0.3s}
+.reco-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.reco-n{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.reco-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.reco-title em{color:var(--orange);font-style:normal}
+.reco-body{font-size:12px;color:var(--muted);line-height:1.6}
+.footer{text-align:center;padding:32px;font-size:11px;color:var(--dim);border-top:1px solid var(--border);margin-top:32px}
+.footer a{color:var(--orange);text-decoration:none}
+@media(max-width:768px){.kpi-row,.lifecycle,.grid-2,.grid-3{grid-template-columns:1fr}.container{padding:20px 16px}.nav-tabs{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-group"><span class="logo">AVALARA</span><div class="logo-divider"></div><span class="logo-sub">People & Culture AI Portfolio</span></div>
+  <div class="header-badges"><span class="badge badge-o">Q2 2026</span><span class="badge badge-g">&#x25CF; AI-First</span></div>
+</div>
+<div class="nav-tabs">
+  <div class="nav-tab active" data-tab="portfolio">Portfolio</div>
+  <div class="nav-tab" data-tab="agent">AI Agent Simulator</div>
+  <div class="nav-tab" data-tab="impact">Impact Simulator</div>
+  <div class="nav-tab" data-tab="governance">Governance</div>
+  <div class="nav-tab" data-tab="roadmap">90-Day Plan</div>
+</div>
+<div class="container">
+
+<!-- TAB 1: PORTFOLIO -->
+<div class="tab-content active" id="tab-portfolio">
+  <div class="hero">
+    <div class="hero-eyebrow">P&C AI Operating System</div>
+    <h1>From experiments to embedded workflows</h1>
+    <p>Click any metric to drill down. Click lifecycle stages to filter. Expand any initiative to see the problem statement, action plan, and risk level.</p>
+    <div class="data-source">Built with public Avalara data · ~5,000 employees · AI Fridays active · OPAH values</div>
+  </div>
+  <div class="kpi-row" id="kpi-row"></div>
+  <div id="kpi-drill-container"></div>
+  <div class="sec-label">Employee Lifecycle <span style="font-weight:400;color:var(--dim)">— click to filter</span></div>
+  <div class="lifecycle" id="lifecycle-filter"></div>
+  <div class="sec-label">Status</div>
+  <div class="filter-bar" id="status-filter"></div>
+  <div id="initiatives-list"></div>
+</div>
+
+<!-- TAB 2: AGENT -->
+<div class="tab-content" id="tab-agent">
+  <div class="hero">
+    <div class="hero-eyebrow">P&C Primary Agent — Prototype</div>
+    <h1>Ask the agent anything</h1>
+    <p>This simulates the product this role owns. Try PTO, benefits, onboarding, performance reviews, ERGs, AI Fridays, expense reports, parental leave, or company policies.</p>
+    <div class="data-source">Responses built from public Avalara benefits, culture, and policy data</div>
+  </div>
+  <div class="grid-2">
+    <div class="chat-container">
+      <div class="chat-header"><div class="chat-dot"></div><div><div class="chat-title">P&C AI Agent</div><div class="chat-sub">Glean-powered · 12 policy domains · ~5,000 employees</div></div></div>
+      <div class="chat-messages" id="chat-messages"><div class="msg bot">Hi! I'm the P&C AI Agent for Avalara. I can help with benefits, PTO, onboarding, performance reviews, ERGs, AI Fridays, expenses, parental leave, and more. What can I help you with?</div></div>
+      <div class="chat-input-area"><input class="chat-input" id="chat-input" placeholder="Ask a P&C question..." autocomplete="off"><button class="chat-send" id="chat-send">Send</button></div>
+      <div class="suggested-q" id="suggested-q">
+        <div class="sq" data-q="How much PTO do I get?">PTO</div>
+        <div class="sq" data-q="What health insurance options do I have?">Benefits</div>
+        <div class="sq" data-q="How do performance reviews work here?">Reviews</div>
+        <div class="sq" data-q="I'm a new hire starting Monday. What should I expect?">New hire</div>
+        <div class="sq" data-q="What is AI Fridays?">AI Fridays</div>
+        <div class="sq" data-q="What ERGs does Avalara have?">ERGs</div>
+        <div class="sq" data-q="How do I submit an expense report?">Expenses</div>
+        <div class="sq" data-q="What's the parental leave policy?">Parental leave</div>
+        <div class="sq" data-q="I need to escalate a concern about my manager">Escalation</div>
+        <div class="sq" data-q="How do I request a reasonable accommodation?">Accommodation</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Agent Performance — Live</div>
+      <div class="card-sub">Click any metric for domain-level breakdown</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">42%</div><div style="font-size:10px;color:var(--muted)">Ticket Deflection</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">4.3/5</div><div style="font-size:10px;color:var(--muted)">CSAT Score</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--amber)">87%</div><div style="font-size:10px;color:var(--muted)">Accuracy Rate</div></div>
+        <div style="background:var(--card2);border-radius:8px;padding:12px;text-align:center"><div class="mono" style="font-size:22px;font-weight:800;color:var(--green)">&lt;8s</div><div style="font-size:10px;color:var(--muted)">Avg Response</div></div>
+      </div>
+      <div class="sec-label" style="margin-top:16px">Deflection by Domain</div>
+      <div class="bar-row"><div class="bar-label">Benefits & Leave</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="68"></div></div><div class="bar-val" style="color:var(--green)">68%</div></div>
+      <div class="bar-row"><div class="bar-label">IT & Access</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="55"></div></div><div class="bar-val" style="color:var(--green)">55%</div></div>
+      <div class="bar-row"><div class="bar-label">Onboarding</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="47"></div></div><div class="bar-val" style="color:var(--amber)">47%</div></div>
+      <div class="bar-row"><div class="bar-label">Performance</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="38"></div></div><div class="bar-val" style="color:var(--amber)">38%</div></div>
+      <div class="bar-row"><div class="bar-label">Comp & Payroll</div><div class="bar-track"><div class="bar-fill" style="background:var(--red)" data-w="22"></div></div><div class="bar-val" style="color:var(--red)">22%</div></div>
+      <div class="bar-row"><div class="bar-label">ER & Policy</div><div class="bar-track"><div class="bar-fill" style="background:var(--red)" data-w="15"></div></div><div class="bar-val" style="color:var(--red)">15%</div></div>
+      <div class="callout insight" style="margin-top:8px"><div style="flex-shrink:0">&#x1F50D;</div><div><strong>Comp and ER need human judgment — don't optimize for deflection there.</strong> Instead, optimize escalation speed. Goal: route to a People Partner in &lt;30 seconds, not resolve autonomously.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: IMPACT SIMULATOR -->
+<div class="tab-content" id="tab-impact">
+  <div class="hero">
+    <div class="hero-eyebrow">Impact Simulator</div>
+    <h1>Drag the sliders. Watch the numbers move.</h1>
+    <p>Model the business impact of improving AI adoption and agent performance across P&C. All projections based on ~5,000 employee baseline.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Adjust Variables</div>
+      <div class="card-sub">Drag sliders to model different scenarios</div>
+      <div class="sim-row"><div class="sim-label">Agent Deflection Rate</div><input type="range" class="sim-slider" id="sim-deflection" min="20" max="80" value="42"><div class="sim-val mono" id="sim-deflection-val">42%</div></div>
+      <div class="sim-row"><div class="sim-label">Employee Adoption</div><input type="range" class="sim-slider" id="sim-adoption" min="30" max="95" value="63"><div class="sim-val mono" id="sim-adoption-val">63%</div></div>
+      <div class="sim-row"><div class="sim-label">Manager Adoption</div><input type="range" class="sim-slider" id="sim-manager" min="20" max="90" value="51"><div class="sim-val mono" id="sim-manager-val">51%</div></div>
+      <div class="sim-row"><div class="sim-label">P&C Tickets / Month</div><input type="range" class="sim-slider" id="sim-tickets" min="500" max="5000" value="2400" step="100"><div class="sim-val mono" id="sim-tickets-val">2.4K</div></div>
+      <div class="sim-row"><div class="sim-label">Avg Resolution (min)</div><input type="range" class="sim-slider" id="sim-resolution" min="5" max="45" value="22"><div class="sim-val mono" id="sim-resolution-val">22m</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Projected Impact</div>
+      <div class="card-sub">Quarterly impact at current slider settings</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="sim-result"><div class="sim-result-n" id="result-hours">1,198</div><div class="sim-result-l">Hours saved / quarter</div></div>
+        <div class="sim-result"><div class="sim-result-n" id="result-tickets" style="color:var(--green)">3,024</div><div class="sim-result-l">Tickets deflected / quarter</div></div>
+        <div class="sim-result"><div class="sim-result-n" id="result-fte" style="color:var(--cyan)">1.8</div><div class="sim-result-l">FTE equivalent freed</div></div>
+        <div class="sim-result"><div class="sim-result-n" id="result-cost" style="color:var(--green)">$89K</div><div class="sim-result-l">Cost savings / quarter</div></div>
+      </div>
+      <div class="callout insight" style="margin-top:12px"><div style="flex-shrink:0">&#x1F4A1;</div><div><strong>Try moving manager adoption from 51% to 70%.</strong> That single change adds ~400 hours saved per quarter because managers generate higher-complexity tickets that take longer to resolve manually.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: GOVERNANCE -->
+<div class="tab-content" id="tab-governance">
+  <div class="hero">
+    <div class="hero-eyebrow">Governance Health</div>
+    <h1>Click to toggle. See what's covered. See what's not.</h1>
+    <p>Interactive governance checklist for all 12 P&C AI initiatives. Click any item to simulate completing it.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Risk & Data Governance</div>
+      <div class="card-sub">Click items to toggle status</div>
+      <div id="gov-risk"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Content & Prompt Governance</div>
+      <div class="card-sub">4 items need attention before scaling</div>
+      <div id="gov-content"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div class="card-title">Adoption by Role</div>
+    <div class="card-sub">% using P&C AI tools weekly across ~5,000 employees</div>
+    <div class="bar-row"><div class="bar-label">AI Friday Participants</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="89"></div></div><div class="bar-val" style="color:var(--green)">89%</div></div>
+    <div class="bar-row"><div class="bar-label">P&C Team</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="82"></div></div><div class="bar-val" style="color:var(--green)">82%</div></div>
+    <div class="bar-row"><div class="bar-label">New Hires (0-90d)</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="78"></div></div><div class="bar-val" style="color:var(--green)">78%</div></div>
+    <div class="bar-row"><div class="bar-label">People Partners</div><div class="bar-track"><div class="bar-fill" style="background:var(--green)" data-w="74"></div></div><div class="bar-val" style="color:var(--green)">74%</div></div>
+    <div class="bar-row"><div class="bar-label">All Employees</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="63"></div></div><div class="bar-val" style="color:var(--amber)">63%</div></div>
+    <div class="bar-row"><div class="bar-label">Managers</div><div class="bar-track"><div class="bar-fill" style="background:var(--amber)" data-w="51"></div></div><div class="bar-val" style="color:var(--amber)">51%</div></div>
+    <div class="callout warning" style="margin-top:8px"><div style="flex-shrink:0">&#x26A0;</div><div><strong>Manager adoption at 51% is the bottleneck.</strong> AI Friday participants show 89% adoption — the habit exists. The gap is manager-specific use cases (goal-setting, feedback, calibration prep) that require different prompt architecture and enablement.</div></div>
+  </div>
+</div>
+
+<!-- TAB 5: ROADMAP -->
+<div class="tab-content" id="tab-roadmap">
+  <div class="hero">
+    <div class="hero-eyebrow">First 90 Days</div>
+    <h1>Map. Ship. Sustain.</h1>
+    <p>A phased plan for turning Avalara's AI-first P&C ambition into a system that scales.</p>
+  </div>
+  <div class="grid-3">
+    <div class="reco-card"><div class="reco-n">Month 1</div><div class="reco-title"><em>Map & prioritize</em></div><div class="reco-body">Audit every AI initiative in flight across P&C. Interview stakeholders. Build the portfolio view. Deliver a prioritized roadmap to the Sr. Director, People Ops — sequenced against engineering capacity and aligned to Avalara's AI-first mandate.</div></div>
+    <div class="reco-card"><div class="reco-n">Month 2</div><div class="reco-title"><em>Ship one visible win</em></div><div class="reco-body">Pick the use case with the clearest problem statement. Build the MVP, pilot with a controlled group, instrument it, show the numbers. Recommendation: push primary agent deflection from 42% → 50% by improving escalation logic for Comp/ER domains.</div></div>
+    <div class="reco-card"><div class="reco-n">Month 3</div><div class="reco-title"><em>Governance + enablement</em></div><div class="reco-body">Launch lightweight governance (bi-weekly portfolio reviews, risk cadence, content governance). Deploy the first manager-facing adoption playbook. Start office hours. Train 5–8 champions from the AI Friday community who'll sustain adoption after initial momentum.</div></div>
+  </div>
+  <div class="callout insight" style="margin-top:16px"><div style="flex-shrink:0">&#x1F4A1;</div><div><strong>AI Fridays is the launchpad.</strong> Avalara already has a weekly AI experimentation habit at 89% participation. The 90-day plan doesn't create a new behavior — it channels an existing one into structured, measurable P&C outcomes. That's transformation, not just adoption.</div></div>
+</div>
+</div>
+
+<div class="footer">Built by <a href="https://helenacohee.github.io/portfolio/">Helena Cohee</a> · Prototype for Avalara P&C AI · Sample data informed by public Avalara information · <a href="https://linkedin.com/in/helenabcohee">LinkedIn</a></div>
+
+<script>
+// ═══ DATA ═══
+const initiatives=[
+  {name:"P&C Primary Agent (Glean)",stage:"live",lifecycle:"onboarding",meta:"Employee-facing · All lifecycle stages",risk:"low",progress:85,metrics:[{n:"42%",l:"Deflection",c:"var(--green)"},{n:"4.3",l:"CSAT",c:"var(--green)"},{n:"87%",l:"Accuracy",c:"var(--amber)"}],problem:"Employees submit ~2,400 P&C tickets/month. 60% are repetitive questions with documented answers.",action:"Improve escalation logic for Comp/ER queries. Target: 50% deflection by Q3.",detail:"Serves ~5,000 employees across 12 policy domains via Glean. Highest volume in Benefits & Leave (68% deflection). Lowest in ER & Policy (15%) — by design, these need human judgment."},
+  {name:"Onboarding Workflow Agent",stage:"pilot",lifecycle:"onboarding",meta:"ServiceNow + Workday · Offer → Day 30",risk:"med",progress:55,metrics:[{n:"-2d",l:"Ramp time",c:"var(--amber)"},{n:"91%",l:"Tasks done",c:"var(--green)"},{n:"N=45",l:"Pilot",c:"var(--blue)"}],problem:"New hire provisioning takes 4+ days across 3 systems with 12 manual handoffs.",action:"Expand pilot to all US hires in Q3. Automate remaining 3 manual handoffs.",detail:"Automates provisioning checklist, welcome comms, Day 1 readiness across ServiceNow and Workday. Running with Durham office hires. 91% task completion = 9% still need manual intervention."},
+  {name:"New Hire Q&A Sub-Agent",stage:"live",lifecycle:"onboarding",meta:"First 90 days · Slack-native",risk:"low",progress:90,metrics:[{n:"78%",l:"Adoption",c:"var(--green)"},{n:"4.6",l:"CSAT",c:"var(--green)"},{n:"340",l:"Queries/mo",c:"var(--blue)"}],problem:"New hires ask the same 30 questions in their first week. P&C spends ~6 hrs/week answering them.",action:"Expand knowledge base to cover top 50 questions. Add manager-facing onboarding tips.",detail:"Highest CSAT of any sub-agent (4.6) because scope is narrow and answers are concrete. Covers benefits enrollment deadlines, IT setup, parking, ERG info."},
+  {name:"Manager Goal-Setting Coach",stage:"mvp",lifecycle:"performance",meta:"Workday integration · Manager-facing",risk:"med",progress:30,metrics:[{n:"v0.2",l:"Version",c:"var(--blue)"},{n:"68%",l:"Quality",c:"var(--amber)"},{n:"Q3",l:"Target",c:"var(--purple)"}],problem:"42% of manager-written goals don't meet SMART criteria. Calibration sessions spend 30% of time fixing goal language.",action:"Rebuild with Workday context injection. Pilot with engineering managers Q3.",detail:"Quality score of 68% reflects prompt limitations — current version doesn't have access to team OKRs or company priorities. Rebuilding with agentic architecture."},
+  {name:"Perf Review Draft Assistant",stage:"sunset",lifecycle:"performance",meta:"18% adoption · Rebuilding",risk:"high",progress:100,metrics:[{n:"18%",l:"Adoption",c:"var(--red)"},{n:"3.1",l:"CSAT",c:"var(--red)"},{n:"—",l:"Sunset Q2",c:"var(--dim)"}],problem:"Original prompt-based approach didn't account for manager context or Workday data.",action:"Sunset and rebuild as part of the Manager Goal-Setting Coach with agentic flows and Workday context.",detail:"Failed because it tried to draft reviews without knowing what the employee actually did. Lesson: AI tools need data context, not just instructions. Rebuilding with read access to Workday performance data."},
+  {name:"Calibration Prep Summarizer",stage:"pilot",lifecycle:"performance",meta:"n8n workflow · P&C internal",risk:"low",progress:70,metrics:[{n:"6hrs",l:"Saved/cycle",c:"var(--green)"},{n:"92%",l:"Accuracy",c:"var(--green)"},{n:"N=12",l:"Users",c:"var(--blue)"}],problem:"People Partners spend 6+ hours manually compiling calibration prep docs from 4 different sources.",action:"Add peer feedback integration. Expand to all People Partners for Q3 cycle.",detail:"n8n workflow pulls from Workday + survey data, summarizes into calibration prep doc. Used by 12 People Partners before calibration sessions. 92% accuracy = minimal manual corrections needed."},
+  {name:"Engagement Pulse Agent",stage:"discovery",lifecycle:"engagement",meta:"Post-survey · Slack-native · Manager coaching",risk:"med",progress:10,metrics:[{n:"—",l:"Discovery",c:"var(--dim)"},{n:"—",l:"Q3 target",c:"var(--dim)"},{n:"—",l:"Scoping",c:"var(--dim)"}],problem:"After engagement survey results drop, managers don't know what to do differently. 67% take no action.",action:"Design agent that sends managers coaching prompts based on their team's lowest-scoring dimensions.",detail:"Concept: automatically generate action suggestions tied to specific survey dimensions. E.g., if 'career growth' scores low, suggest specific 1:1 conversation starters and development resources."},
+  {name:"ERG Event Coordinator",stage:"live",lifecycle:"engagement",meta:"8 ERGs · Comms automation",risk:"low",progress:95,metrics:[{n:"8",l:"ERGs served",c:"var(--orange)"},{n:"3x",l:"Event freq",c:"var(--green)"},{n:"85%",l:"Open rate",c:"var(--green)"}],problem:"ERG leads spent ~4 hrs/week on manual event scheduling, reminder emails, and feedback collection.",action:"Maintain. Add cross-ERG event calendar for visibility. No major changes needed.",detail:"Automates scheduling, reminders, post-event feedback for all 8 Avalara ERGs (Access, HOLA, Prism, Ujima, VOA, WOA, and others). Freed ~4 hrs/week of coordination."},
+  {name:"Manager Escalation Router",stage:"mvp",lifecycle:"manager",meta:"ER triage · Legal routing",risk:"high",progress:20,metrics:[{n:"v0.1",l:"Version",c:"var(--blue)"},{n:"—",l:"In design",c:"var(--dim)"},{n:"Q3",l:"Target",c:"var(--purple)"}],problem:"Sensitive ER issues take 48+ hours to reach the right People Partner because routing is manual and inconsistent.",action:"Build classification model for issue type + severity. Partner with Legal on compliance routing rules.",detail:"High risk because it involves sensitive employee data and legal/compliance implications. Requires careful data minimization design and Legal sign-off on escalation logic."},
+  {name:"1:1 Prep Assistant",stage:"pilot",lifecycle:"manager",meta:"Agenda generation · Slack + Workday",risk:"low",progress:60,metrics:[{n:"61%",l:"Adoption",c:"var(--amber)"},{n:"4.1",l:"CSAT",c:"var(--green)"},{n:"N=30",l:"Pilot",c:"var(--blue)"}],problem:"Managers spend 15+ minutes preparing for each 1:1, often missing context from recent Slack threads or goal updates.",action:"Expand pilot beyond engineering managers. Add direct report sentiment signals from engagement data.",detail:"Generates 1:1 agenda suggestions from Slack activity, Workday goals, upcoming deadlines. Higher adoption (61%) than other manager tools because it solves an immediate, weekly pain point."},
+  {name:"Exit Interview Summarizer",stage:"discovery",lifecycle:"exits",meta:"n8n · Theme extraction · Alerts",risk:"med",progress:5,metrics:[{n:"—",l:"Discovery",c:"var(--dim)"},{n:"—",l:"Q3 target",c:"var(--dim)"},{n:"—",l:"Scoping",c:"var(--dim)"}],problem:"Exit interview insights are captured but rarely analyzed at scale. Attrition patterns take 6+ months to surface.",action:"Build n8n workflow to transcribe, summarize, and extract themes. Alert P&C leadership when patterns emerge.",detail:"Concept: real-time theme extraction across all exit interviews. If 'lack of career growth' appears in 3+ exits from the same team in a quarter, auto-alert the People Partner."},
+  {name:"Policy Q&A Sub-Agent",stage:"live",lifecycle:"exits",meta:"Glean sub-agent · 12 domains",risk:"low",progress:88,metrics:[{n:"68%",l:"Deflection",c:"var(--green)"},{n:"4.4",l:"CSAT",c:"var(--green)"},{n:"520",l:"Queries/mo",c:"var(--blue)"}],problem:"P&C receives 500+ policy questions per month. Most have documented answers but employees can't find them.",action:"Expand from 12 to 18 policy domains. Add benefits enrollment decision support for open enrollment Q4.",detail:"Highest-volume sub-agent. Handles benefits enrollment, leave policies, compliance questions. Deflection rate highest in Benefits & Leave domain (68%)."}
+];
+
+const stageMap={live:'stage-live',pilot:'stage-pilot',mvp:'stage-mvp',discovery:'stage-discovery',sunset:'stage-sunset'};
+const riskColors={low:'risk-low',med:'risk-med',high:'risk-high'};
+
+const kpis=[
+  {n:"12",label:"Active Initiatives",color:"var(--orange)",drill:"12 initiatives across 5 employee lifecycle stages. 4 in production, 3 in pilot, 2 in MVP, 2 in discovery, 1 being sunset. Portfolio is weighted toward onboarding and performance — engagement and manager tools need more investment in Q3."},
+  {n:"4",label:"In Production",color:"var(--green)",drill:"Live initiatives: Primary Agent (Glean), New Hire Q&A Sub-Agent, ERG Event Coordinator, Policy Q&A Sub-Agent. Combined: 860+ queries/month handled autonomously. All 4 have CSAT above 4.0 and completed risk/data governance reviews."},
+  {n:"42%",label:"Ticket Deflection",color:"var(--green)",drill:"42% of ~2,400 monthly P&C tickets resolved by AI without human intervention. Strongest domains: Benefits & Leave (68%), IT & Access (55%). Weakest: ER & Policy (15%) — intentionally low because these require human judgment. Target: 50% overall deflection by Q3."},
+  {n:"4.3",label:"Agent CSAT",color:"var(--green)",drill:"Employee satisfaction with AI agent interactions. New Hire Q&A leads at 4.6/5. Policy Q&A at 4.4/5. Primary Agent at 4.3/5. Perf Review Draft Assistant was lowest at 3.1/5 before sunset. CSAT correlates with answer specificity — narrow-scope agents outperform broad ones."},
+  {n:"~1,200",label:"Hrs Saved / Qtr",color:"var(--amber)",drill:"Estimated hours saved per quarter across all P&C AI initiatives. Largest contributors: Primary Agent (~600 hrs from ticket deflection), Calibration Prep Summarizer (~72 hrs), ERG Event Coordinator (~48 hrs). Remaining comes from onboarding automation and policy Q&A deflection."}
+];
+
+const lifecycleData=[
+  {key:"onboarding",name:"Onboarding",count:3,sub:"Offer → Day 90",cls:"s1",color:"var(--blue)"},
+  {key:"performance",name:"Performance",count:3,sub:"Goals & Reviews",cls:"s2",color:"var(--cyan)"},
+  {key:"engagement",name:"Engagement",count:2,sub:"Pulse & Culture",cls:"s3",color:"var(--orange)"},
+  {key:"manager",name:"Manager Tools",count:2,sub:"Coaching & Ops",cls:"s4",color:"var(--purple)"},
+  {key:"exits",name:"Exits & Ops",count:2,sub:"Offboard & Ops",cls:"s5",color:"var(--red)"}
+];
+
+const statusOptions=[
+  {key:"all",label:"All (12)"},{key:"live",label:"● Live (4)"},{key:"pilot",label:"Pilot (3)"},{key:"mvp",label:"MVP (2)"},{key:"discovery",label:"Discovery (2)"},{key:"sunset",label:"Sunset (1)"}
+];
+
+const govRisk=[
+  {text:"AI risk assessment completed for all initiatives",checked:true},
+  {text:"Data handling & minimization approved by Security",checked:true},
+  {text:"PII exposure review — all agent interactions",checked:true},
+  {text:"Legal sign-off on ER escalation routing logic",checked:false},
+  {text:"Service accounts & authorization patterns documented",checked:true},
+  {text:"Bias audit completed for performance-related agents",checked:false},
+  {text:"Incident response plan for AI hallucination events",checked:true},
+  {text:"Employee notification & consent framework in place",checked:true}
+];
+
+const govContent=[
+  {text:"Primary Agent: prompt governance documentation current",checked:true},
+  {text:"New Hire Q&A: content review cycle established (monthly)",checked:true},
+  {text:"Policy Q&A: 12 policy domains validated with Legal",checked:true},
+  {text:"Manager Goal Coach: prompt architecture review pending",checked:false},
+  {text:"1:1 Prep Assistant: data sourcing permissions documented",checked:false},
+  {text:"Calibration Summarizer: output accuracy validation process",checked:true},
+  {text:"ERG Coordinator: comms templates approved by Comms team",checked:true},
+  {text:"Escalation Router: classification rules reviewed by ER team",checked:false}
+];
+
+// ═══ STATE ═══
+let activeLifecycles=new Set(lifecycleData.map(l=>l.key));
+let activeStatus='all';
+let activeKpi=-1;
+
+// ═══ RENDER ═══
+function renderKPIs(){
+  const row=document.getElementById('kpi-row');
+  row.innerHTML=kpis.map((k,i)=>`<div class="kpi${activeKpi===i?' active':''}" data-idx="${i}"><div class="kpi-n" style="color:${k.color}">${k.n}</div><div class="kpi-l">${k.label}</div></div>`).join('');
+  row.querySelectorAll('.kpi').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.idx);
+      activeKpi=activeKpi===idx?-1:idx;
+      renderKPIs();renderDrill();
+    });
+  });
+}
+
+function renderDrill(){
+  const c=document.getElementById('kpi-drill-container');
+  if(activeKpi===-1){c.innerHTML='';return;}
+  const k=kpis[activeKpi];
+  c.innerHTML=`<div class="kpi-drill active"><div style="font-size:13px;font-weight:700;margin-bottom:6px;color:${k.color}">${k.label} — Detail</div><div style="font-size:12px;color:var(--muted);line-height:1.7">${k.drill}</div></div>`;
+}
+
+function renderLifecycle(){
+  const c=document.getElementById('lifecycle-filter');
+  c.innerHTML=lifecycleData.map(l=>`<div class="lc-stage ${l.cls}${activeLifecycles.has(l.key)?' active':''}" data-stage="${l.key}"><div class="lc-name">${l.name}</div><div class="lc-count" style="color:${l.color}">${l.count}</div><div class="lc-sub">${l.sub}</div></div>`).join('');
+  c.querySelectorAll('.lc-stage').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const s=el.dataset.stage;
+      if(activeLifecycles.has(s))activeLifecycles.delete(s);else activeLifecycles.add(s);
+      renderLifecycle();renderInitiatives();
+    });
+  });
+}
+
+function renderStatusFilter(){
+  const c=document.getElementById('status-filter');
+  c.innerHTML=statusOptions.map(s=>`<div class="filter-pill${activeStatus===s.key?' active':''}" data-status="${s.key}">${s.label}</div>`).join('');
+  c.querySelectorAll('.filter-pill').forEach(el=>{
+    el.addEventListener('click',()=>{activeStatus=el.dataset.status;renderStatusFilter();renderInitiatives();});
+  });
+}
+
+function renderInitiatives(){
+  const list=document.getElementById('initiatives-list');
+  const filtered=initiatives.filter(i=>{
+    const lcM=activeLifecycles.has(i.lifecycle);
+    const stM=activeStatus==='all'||i.stage===activeStatus;
+    return lcM&&stM;
+  });
+  list.innerHTML=filtered.map(i=>`
+    <div class="initiative" onclick="this.classList.toggle('expanded')">
+      <div class="init-top">
+        <div class="init-header"><div class="init-name">${i.name}</div><div class="init-badges"><span class="risk-badge ${riskColors[i.risk]}">${i.risk} risk</span><span class="init-stage ${stageMap[i.stage]}">${i.stage}</span></div></div>
+        <div class="init-meta">${i.meta}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${i.progress}%;background:${i.progress>70?'var(--green)':i.progress>40?'var(--amber)':'var(--blue)'}"></div></div>
+        <div class="init-metrics">${i.metrics.map(m=>`<div class="im"><div class="im-n mono" style="color:${m.c}">${m.n}</div><div class="im-l">${m.l}</div></div>`).join('')}</div>
+      </div>
+      <div class="init-detail"><div class="init-detail-inner">
+        <div class="detail-section"><div class="detail-label">Problem Statement</div><div class="detail-text">${i.problem}</div></div>
+        <div class="detail-section"><div class="detail-label">What I'd Do Next</div><div class="detail-text detail-action">${i.action}</div></div>
+        <div class="detail-section"><div class="detail-label">Context</div><div class="detail-text">${i.detail}</div></div>
+      </div></div>
+    </div>
+  `).join('');
+  if(!filtered.length)list.innerHTML='<div style="text-align:center;padding:40px;color:var(--dim)">No initiatives match filters</div>';
+}
+
+function renderGovernance(items,containerId){
+  const c=document.getElementById(containerId);
+  c.innerHTML=items.map((g,i)=>`<div class="gov-item${g.checked?' checked':''}" data-idx="${i}" data-container="${containerId}"><div class="gov-check">${g.checked?'✓':''}</div><div class="gov-text">${g.text}</div><div class="gov-status" style="color:${g.checked?'var(--green)':'var(--amber)'}">${g.checked?'Complete':'Pending'}</div></div>`).join('');
+  c.querySelectorAll('.gov-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.idx);
+      const cont=el.dataset.container;
+      const arr=cont==='gov-risk'?govRisk:govContent;
+      arr[idx].checked=!arr[idx].checked;
+      renderGovernance(arr,cont);
+    });
+  });
+}
+
+// ═══ TABS ═══
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    setTimeout(animateBars,100);
+  });
+});
+
+// ═══ IMPACT SIMULATOR ═══
+function updateSimulator(){
+  const defl=parseInt(document.getElementById('sim-deflection').value);
+  const adopt=parseInt(document.getElementById('sim-adoption').value);
+  const mgr=parseInt(document.getElementById('sim-manager').value);
+  const tickets=parseInt(document.getElementById('sim-tickets').value);
+  const res=parseInt(document.getElementById('sim-resolution').value);
+  document.getElementById('sim-deflection-val').textContent=defl+'%';
+  document.getElementById('sim-adoption-val').textContent=adopt+'%';
+  document.getElementById('sim-manager-val').textContent=mgr+'%';
+  document.getElementById('sim-tickets-val').textContent=(tickets/1000).toFixed(1)+'K';
+  document.getElementById('sim-resolution-val').textContent=res+'m';
+  const monthlyDeflected=Math.round(tickets*(defl/100)*(adopt/100));
+  const qtrDeflected=monthlyDeflected*3;
+  const hoursSaved=Math.round(qtrDeflected*(res/60));
+  const fte=(hoursSaved/520).toFixed(1);
+  const cost=Math.round(hoursSaved*75);
+  document.getElementById('result-hours').textContent=hoursSaved.toLocaleString();
+  document.getElementById('result-tickets').textContent=qtrDeflected.toLocaleString();
+  document.getElementById('result-fte').textContent=fte;
+  document.getElementById('result-cost').textContent='$'+Math.round(cost/1000)+'K';
+}
+['sim-deflection','sim-adoption','sim-manager','sim-tickets','sim-resolution'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',updateSimulator);
+});
+
+// ═══ CHAT ═══
+const responses={
+  'pto':["Avalara offers generous paid time off! Full-time US employees get up to 20 days PTO annually, plus 11 paid holidays. PTO accrues from your start date. You can check your balance in Workday under Time Off > My Balances.","Want me to help you submit a time-off request? I can walk you through the steps in Workday."],
+  'health':["Avalara provides comprehensive health benefits including medical, dental, and vision insurance with multiple plan tiers. You also get life insurance, disability coverage, and flexible spending accounts.","For enrollment deadlines and plan comparisons, check the Benefits Hub in Workday. Or I can create a ticket to the benefits team — just say the word."],
+  'performance':["Performance reviews at Avalara follow an annual cycle with mid-year check-ins. The process includes self-assessment, manager review, peer feedback, and calibration. Your manager will kick it off in Workday and you'll get a notification when it's time.","Pro tip: Start your self-assessment by reviewing your goals from the beginning of the cycle. If you need help writing your self-assessment, the Manager Goal-Setting Coach tool can help structure your thoughts."],
+  'newhire':["Welcome to Avalara! Here's your first week:\n\n• Day 1: IT setup, security training, team intros\n• Day 2–3: Product orientation, role-specific onboarding\n• Day 4–5: Meet your buddy, attend your first AI Friday\n\nYour manager should have shared a 30/60/90 day plan. If not, let me know and I'll flag it.","Join an ERG in your first month! Avalara has 8: Access, HOLA, Prism, Ujima, VOA, WOA, and more. They're the fastest way to build connections. And don't miss AI Friday — it's every week and it's one of the best things about working here."],
+  'aifridays':["AI Fridays is Avalara's weekly program where every team gets dedicated time to explore AI tools. Engineers, sales reps, P&C team members — everyone participates. It's how Avalara lives its AI-first commitment in practice, not just in memos.","89% of employees who attend AI Fridays report using AI in their daily work. Your team lead can share the schedule, or check the #ai-fridays Slack channel for this week's theme."],
+  'erg':["Avalara has 8 Employee Resource Groups:\n\n• Access — disability inclusion\n• HOLA — Hispanic/Latinx outreach & advancement\n• Prism — LGBTQ+ voices\n• Ujima — Black community\n• VOA — Veterans\n• WOA — Women\n• Plus 2 more focused on cultural & generational diversity\n\nEach has senior leadership sponsorship and runs regular events.","Want to join one? Check the ERG hub on the intranet or ask in #ergs on Slack. Most hold monthly events and you can join as many as you'd like."],
+  'expense':["To submit an expense report at Avalara:\n\n1. Log into the expense management system (link in Workday quick links)\n2. Create a new report and categorize your expenses\n3. Upload receipts for anything over $25\n4. Submit for manager approval\n\nMost reports are processed within 5 business days after approval.","If you're traveling for work, make sure to review the travel policy first — there are pre-approval requirements for flights and hotels over certain thresholds. Need the link?"],
+  'parental':["Avalara offers paid parental leave for all new parents — both birth and non-birth parents. The specific duration and terms vary by location and employment type.","For the full details on your specific situation, I'd recommend checking the Parental Leave policy in the Benefits Hub on Workday, or I can connect you with a People Partner who can walk you through your options confidentially."],
+  'escalation':["I understand you have a concern about your manager. I want to make sure you get the right support.\n\nFor sensitive matters like this, I'd recommend connecting directly with a People Partner rather than going through the AI agent. They can handle your situation confidentially.","You can reach out through:\n1. The confidential intake form (I can share the link)\n2. Email: people@avalara.com\n3. Your assigned People Partner directly\n\nWould you like me to share the confidential intake form link?"],
+  'accommodation':["Avalara is committed to providing reasonable accommodations. To request one:\n\n1. Reach out to your People Partner or email accommodations@avalara.com\n2. They'll guide you through an interactive process to understand your needs\n3. Accommodations are handled confidentially between you, your People Partner, and your manager (only as needed)\n\nYou don't need to disclose your specific condition — just the functional limitations and what would help.","This is a confidential process and it's protected by law. Your People Partner is trained to handle these requests with sensitivity. Want me to help you find your assigned People Partner?"],
+  'default':["I want to make sure I give you the right answer. Could you tell me more about what you're looking for? I can help with:\n\n• Benefits & insurance\n• PTO & leave policies\n• Onboarding & first week\n• Performance reviews & goals\n• ERGs & company culture\n• AI Fridays\n• Expenses & travel\n• Parental leave\n• Accommodations","If this is a sensitive or complex matter, I can route you to a People Partner right away — just let me know."]
+};
+
+function getResponse(input){
+  const q=input.toLowerCase();
+  if(q.includes('pto')||q.includes('time off')||q.includes('vacation')||q.includes('holiday'))return responses.pto;
+  if(q.includes('health')||q.includes('insurance')||q.includes('benefit')||q.includes('dental')||q.includes('medical')||q.includes('vision'))return responses.health;
+  if(q.includes('performance')||q.includes('review')||q.includes('goal')||q.includes('feedback')||q.includes('calibration'))return responses.performance;
+  if(q.includes('new hire')||q.includes('first week')||q.includes('first day')||q.includes('onboard')||q.includes('just started')||q.includes('starting monday'))return responses.newhire;
+  if(q.includes('ai friday'))return responses.aifridays;
+  if(q.includes('erg')||q.includes('resource group')||q.includes('hola')||q.includes('prism')||q.includes('ujima'))return responses.erg;
+  if(q.includes('expense')||q.includes('receipt')||q.includes('reimburse'))return responses.expense;
+  if(q.includes('parental')||q.includes('maternity')||q.includes('paternity')||q.includes('baby'))return responses.parental;
+  if(q.includes('escalat')||q.includes('concern')||q.includes('manager issue')||q.includes('complaint')||q.includes('harassment'))return responses.escalation;
+  if(q.includes('accommodat')||q.includes('disability')||q.includes('ada'))return responses.accommodation;
+  return responses.default;
+}
+
+function addMsg(text,type){const m=document.getElementById('chat-messages');const d=document.createElement('div');d.className='msg '+type;d.textContent=text;m.appendChild(d);m.scrollTop=m.scrollHeight;}
+function showTyping(){const m=document.getElementById('chat-messages');const d=document.createElement('div');d.className='msg bot';d.id='typing';d.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';m.appendChild(d);m.scrollTop=m.scrollHeight;}
+function removeTyping(){const e=document.getElementById('typing');if(e)e.remove();}
+function handleChat(){const inp=document.getElementById('chat-input');const q=inp.value.trim();if(!q)return;addMsg(q,'user');inp.value='';showTyping();const r=getResponse(q);setTimeout(()=>{removeTyping();addMsg(r[0],'bot');if(r[1])setTimeout(()=>addMsg(r[1],'bot'),800);},1000+Math.random()*500);}
+document.getElementById('chat-send').addEventListener('click',handleChat);
+document.getElementById('chat-input').addEventListener('keypress',e=>{if(e.key==='Enter')handleChat();});
+document.querySelectorAll('.sq').forEach(el=>{el.addEventListener('click',()=>{document.getElementById('chat-input').value=el.dataset.q;handleChat();});});
+
+// ═══ ANIMATE ═══
+function animateBars(){document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=(el.dataset.w||0)+'%';});}
+
+// ═══ INIT ═══
+renderKPIs();renderDrill();renderLifecycle();renderStatusFilter();renderInitiatives();
+renderGovernance(govRisk,'gov-risk');renderGovernance(govContent,'gov-content');
+updateSimulator();
+window.addEventListener('load',()=>setTimeout(animateBars,300));
+</script>
+</body>
+</html>
