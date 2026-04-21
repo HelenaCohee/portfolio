@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Activation Roadmap | Helena Cohee for Cribl</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #0B0E17; color: #E8EAED; line-height: 1.5; padding: 24px; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  header { text-align: center; padding: 24px 0 32px; border-bottom: 1px solid #1F2937; margin-bottom: 32px; }
+  h1 { font-size: 32pt; font-weight: 700; background: linear-gradient(135deg, #E6572E, #F59E0B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+  .subtitle { color: #9CA3AF; font-size: 11pt; letter-spacing: 0.5px; }
+  .intro-box { background: #131825; border: 1px solid #1F2937; border-radius: 12px; padding: 20px; margin-bottom: 32px; }
+  .intro-box p { color: #D1D5DB; font-size: 10.5pt; }
+  .intro-box strong { color: #E6572E; }
+  
+  .tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { padding: 10px 20px; background: #131825; border: 1px solid #1F2937; border-radius: 8px; cursor: pointer; font-size: 10pt; color: #9CA3AF; transition: all 0.2s; }
+  .tab:hover { border-color: #E6572E; color: #E8EAED; }
+  .tab.active { background: linear-gradient(135deg, #E6572E, #F59E0B); color: #fff; border-color: transparent; font-weight: 600; }
+  
+  .panel { display: none; }
+  .panel.active { display: block; }
+  
+  .function-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .function-card { background: #131825; border: 1px solid #1F2937; border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.2s; }
+  .function-card:hover { border-color: #E6572E; transform: translateY(-2px); }
+  .function-card h3 { color: #E6572E; font-size: 12pt; margin-bottom: 8px; }
+  .function-card .score { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+  .score-bar { flex: 1; height: 6px; background: #1F2937; border-radius: 3px; overflow: hidden; }
+  .score-fill { height: 100%; background: linear-gradient(90deg, #E6572E, #F59E0B); border-radius: 3px; }
+  .score-value { font-size: 9pt; color: #9CA3AF; min-width: 35px; text-align: right; }
+  .function-card .status { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 8pt; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
+  .status.wave-1 { background: #064E3B; color: #6EE7B7; }
+  .status.wave-2 { background: #1E3A8A; color: #93C5FD; }
+  .status.wave-3 { background: #7C2D12; color: #FDBA74; }
+  .status.watch { background: #1F2937; color: #9CA3AF; }
+  .function-card p { font-size: 9pt; color: #9CA3AF; margin-top: 8px; }
+  
+  .roadmap { background: #131825; border: 1px solid #1F2937; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .roadmap h2 { color: #E8EAED; margin-bottom: 16px; font-size: 14pt; }
+  .phase { margin-bottom: 20px; padding-left: 24px; border-left: 2px solid #E6572E; position: relative; }
+  .phase::before { content: ''; position: absolute; left: -7px; top: 4px; width: 12px; height: 12px; background: #E6572E; border-radius: 50%; }
+  .phase h3 { color: #F59E0B; font-size: 11pt; margin-bottom: 6px; }
+  .phase .meta { font-size: 8.5pt; color: #6B7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .phase ul { list-style: none; padding: 0; }
+  .phase li { color: #D1D5DB; font-size: 9.5pt; padding: 4px 0 4px 20px; position: relative; }
+  .phase li::before { content: '→'; color: #E6572E; position: absolute; left: 0; }
+  
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+  .metric-card { background: #131825; border: 1px solid #1F2937; border-radius: 8px; padding: 16px; text-align: center; }
+  .metric-card .metric-value { font-size: 20pt; font-weight: 700; color: #E6572E; }
+  .metric-card .metric-label { font-size: 8.5pt; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  
+  .framework-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .framework-card { background: #131825; border: 1px solid #1F2937; border-radius: 12px; padding: 20px; }
+  .framework-card h3 { color: #E6572E; font-size: 12pt; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .framework-card h3 .icon { width: 24px; height: 24px; background: linear-gradient(135deg, #E6572E, #F59E0B); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12pt; font-weight: 700; }
+  .framework-card ul { list-style: none; padding: 0; }
+  .framework-card li { color: #D1D5DB; font-size: 9.5pt; padding: 6px 0 6px 18px; position: relative; }
+  .framework-card li::before { content: '■'; color: #E6572E; position: absolute; left: 0; font-size: 8pt; }
+  
+  footer { text-align: center; padding: 24px 0; margin-top: 32px; border-top: 1px solid #1F2937; color: #6B7280; font-size: 8.5pt; }
+  footer a { color: #E6572E; text-decoration: none; }
+  
+  @media (max-width: 768px) {
+    .framework-grid { grid-template-columns: 1fr; }
+    h1 { font-size: 22pt; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  
+  <header>
+    <h1>AI Activation Roadmap</h1>
+    <div class="subtitle">An Operating Framework for Cribl's AI Center of Excellence</div>
+  </header>
+
+  <div class="intro-box">
+    <p><strong>Context:</strong> Cribl is the data engine for IT and Security, scaling fast with an executive AI vision that needs to translate into daily adoption across every function. This interactive prototype walks through how I'd operate the AI CoE in the first 90 days, using the same function-by-function activation framework I've run at Netflix. Click through the tabs to see the diagnostic, roadmap, governance model, and measurement approach.</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-panel="functions">1. Function Diagnosis</div>
+    <div class="tab" data-panel="roadmap">2. 90-Day Roadmap</div>
+    <div class="tab" data-panel="governance">3. Governance Framework</div>
+    <div class="tab" data-panel="measurement">4. Measurement</div>
+  </div>
+
+  <!-- FUNCTION DIAGNOSIS PANEL -->
+  <div class="panel active" id="functions">
+    <div class="roadmap">
+      <h2>Where's AI Ready to Land?</h2>
+      <p style="color: #9CA3AF; font-size: 9.5pt; margin-bottom: 16px;">Every function has a different AI readiness profile. Activation sequencing matters. This is my initial hypothesis based on the JD and Cribl's operating model. Would refine rapidly with real data in weeks 1-4.</p>
+      
+      <div class="function-grid">
+        <div class="function-card">
+          <h3>Sales &amp; Sales Engineering</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:85%"></div></div><span class="score-value">85/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:90%"></div></div><span class="score-value">90/100</span></div>
+          <span class="status wave-1">Wave 1 · Lead Program</span>
+          <p>High volume of repetitive tasks (discovery prep, demo scripts, competitive battlecards). LLM copilots and AI knowledge assistants deliver immediate leverage.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Customer Success</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:78%"></div></div><span class="score-value">78/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:82%"></div></div><span class="score-value">82/100</span></div>
+          <span class="status wave-1">Wave 1</span>
+          <p>QBR prep, health scoring narratives, renewal positioning. Structured, pattern-rich work where AI delivers real time savings and quality uplift.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Revenue Operations</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:72%"></div></div><span class="score-value">72/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:75%"></div></div><span class="score-value">75/100</span></div>
+          <span class="status wave-2">Wave 2</span>
+          <p>Forecasting support, deal analysis, reporting automation. Strong ROI but requires governance partnership on CRM data sensitivity.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Marketing</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:88%"></div></div><span class="score-value">88/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:70%"></div></div><span class="score-value">70/100</span></div>
+          <span class="status wave-2">Wave 2</span>
+          <p>Content ideation, campaign analysis, persona workshopping. High readiness, moderate ROI, good candidate for quick Champions Network win.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>People &amp; BizOps</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:65%"></div></div><span class="score-value">65/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:85%"></div></div><span class="score-value">85/100</span></div>
+          <span class="status wave-2">Wave 2 · Co-Design Partner</span>
+          <p>The JD names this as a key co-design partner. People Ops workflows (onboarding, perf cycles, policy authoring) compound when AI-native.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Finance</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:55%"></div></div><span class="score-value">55/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:78%"></div></div><span class="score-value">78/100</span></div>
+          <span class="status wave-3">Wave 3</span>
+          <p>High ROI in vendor analysis and reporting automation, but governance and data sensitivity require more prep before activation.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Engineering &amp; Product</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:92%"></div></div><span class="score-value">92/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:60%"></div></div><span class="score-value">60/100</span></div>
+          <span class="status watch">Likely Self-Driven</span>
+          <p>Extremely high readiness, already using AI tools natively. CoE role here is governance and knowledge sharing, not activation.</p>
+        </div>
+        
+        <div class="function-card">
+          <h3>Legal</h3>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">Readiness</span><div class="score-bar"><div class="score-fill" style="width:45%"></div></div><span class="score-value">45/100</span></div>
+          <div class="score"><span style="font-size:8.5pt;color:#9CA3AF;">ROI Potential</span><div class="score-bar"><div class="score-fill" style="width:50%"></div></div><span class="score-value">50/100</span></div>
+          <span class="status watch">Working Group Partner</span>
+          <p>Legal is a governance working group member more than an activation target. Partnership over program for now.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROADMAP PANEL -->
+  <div class="panel" id="roadmap">
+    <div class="roadmap">
+      <h2>90-Day Activation Roadmap</h2>
+      
+      <div class="phase">
+        <div class="meta">Weeks 1-4 · Diagnose</div>
+        <h3>Embed, Listen, Map</h3>
+        <ul>
+          <li>Meet with Lead of Global Remote Operations, then every working group member (Security, IT, Legal, business function leaders)</li>
+          <li>Inventory current CoE assets: tool library, use policy, intake process, governance framework, enablement materials</li>
+          <li>Run quick-diagnostic surveys or interviews with 20-30 goats across functions to validate the readiness hypothesis</li>
+          <li>Identify the 5-8 highest-leverage Champions Network candidates</li>
+        </ul>
+      </div>
+      
+      <div class="phase">
+        <div class="meta">Weeks 4-10 · Deliver</div>
+        <h3>Ship One Program End-to-End</h3>
+        <ul>
+          <li>Launch Wave 1 activation (likely Sales &amp; SE or CS) with function-specific playbook, training, and AI tool access</li>
+          <li>Stand up measurement framework before launch, not after (adoption KPIs, impact metrics, behavior change indicators)</li>
+          <li>Onboard the first cohort of Champions with a clear cadence and sustainment plan</li>
+          <li>Evolve one or two CoE assets (tool library or use policy) based on diagnosis</li>
+        </ul>
+      </div>
+      
+      <div class="phase">
+        <div class="meta">Weeks 10-90-Day Mark · Scale</div>
+        <h3>Translate Insights into CoE Strategy</h3>
+        <ul>
+          <li>Present diagnostic findings and Wave 1 outcomes to VP and C-suite stakeholders with prioritized roadmap</li>
+          <li>Expand Champions Network to Wave 2 functions with activation playbooks ready</li>
+          <li>Establish CoE operating cadence (working group rhythm, stakeholder reporting, roadmap reviews)</li>
+          <li>Begin shaping the multi-quarter CoE investment thesis for leadership</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOVERNANCE PANEL -->
+  <div class="panel" id="governance">
+    <div class="framework-grid">
+      <div class="framework-card">
+        <h3><span class="icon">1</span>AI Tool Library</h3>
+        <ul>
+          <li>Living, searchable catalog of approved AI tools by function</li>
+          <li>Clear approval tier (Open / Reviewed / Restricted) per tool</li>
+          <li>Use case examples and playbooks attached to each entry</li>
+          <li>Refreshed monthly based on Champions Network feedback</li>
+        </ul>
+      </div>
+      
+      <div class="framework-card">
+        <h3><span class="icon">2</span>Use Policy</h3>
+        <ul>
+          <li>Plain-language guidance, not legal jargon</li>
+          <li>Clear do's and don'ts mapped to common workflows</li>
+          <li>Data classification requirements (what can go where)</li>
+          <li>Escalation path for edge cases and new use cases</li>
+        </ul>
+      </div>
+      
+      <div class="framework-card">
+        <h3><span class="icon">3</span>Intake Process</h3>
+        <ul>
+          <li>Lightweight request form, not a gauntlet</li>
+          <li>SLA commitment for initial triage (48 hours max)</li>
+          <li>Working group routing for complex or sensitive asks</li>
+          <li>Public backlog so goats see what's in motion</li>
+        </ul>
+      </div>
+      
+      <div class="framework-card">
+        <h3><span class="icon">4</span>Champions Network</h3>
+        <ul>
+          <li>One visible champion per function, peer-selected</li>
+          <li>Monthly cadence: training, use case sharing, office hours</li>
+          <li>Quarterly offsite or virtual event with executive sponsor</li>
+          <li>Recognition and career development tied to champion role</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEASUREMENT PANEL -->
+  <div class="panel" id="measurement">
+    <div class="roadmap">
+      <h2>Measurement Framework</h2>
+      <p style="color: #9CA3AF; font-size: 9.5pt; margin-bottom: 16px;">Programs that aren't measured don't earn the right to grow. Three tiers of metrics, each answering a different question leadership will ask.</p>
+      
+      <div class="phase">
+        <div class="meta">Tier 1 · Adoption</div>
+        <h3>Is AI being used?</h3>
+        <ul>
+          <li>Monthly active users of approved AI tools, by function</li>
+          <li>Champions Network engagement (training attendance, use case submissions)</li>
+          <li>Intake volume and approval rate trend</li>
+          <li>Tool library utilization by category</li>
+        </ul>
+      </div>
+      
+      <div class="phase">
+        <div class="meta">Tier 2 · Behavior Change</div>
+        <h3>Is AI changing how work gets done?</h3>
+        <ul>
+          <li>Workflow integration depth (one-off vs. embedded in daily process)</li>
+          <li>Self-reported time savings per workflow, validated against baseline</li>
+          <li>Quality of output before vs. after AI integration (function-specific rubrics)</li>
+          <li>Sustainment rate (are users still using the tool 90 days post-activation?)</li>
+        </ul>
+      </div>
+      
+      <div class="phase">
+        <div class="meta">Tier 3 · Business Impact</div>
+        <h3>Is AI moving the numbers?</h3>
+        <ul>
+          <li>Cycle time reduction on key workflows (e.g., sales cycle, support resolution)</li>
+          <li>Capacity freed up for higher-leverage work, measured in FTE-equivalent hours</li>
+          <li>Function-level OKR contribution attributed to AI activation</li>
+          <li>Cost savings vs. alternative approaches (hiring, vendors, manual effort)</li>
+        </ul>
+      </div>
+      
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">Week 2</div>
+          <div class="metric-label">Dashboard Live</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">Month 3</div>
+          <div class="metric-label">First Full Report</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">Quarterly</div>
+          <div class="metric-label">Exec Review</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">Real-Time</div>
+          <div class="metric-label">Adoption Telemetry</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Prototype built for Cribl's Sr. Remote Ops Manager, AI Strategy role &middot; <a href="https://helenacohee.github.io/portfolio/">helenacohee.github.io/portfolio</a></p>
+    <p style="margin-top:4px;">Helena Cohee &middot; 323-561-1532 &middot; helenacohee@gmail.com</p>
+  </footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.panel).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
