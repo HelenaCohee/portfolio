@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P&C AI Portfolio Operating Framework | Helena Cohee for Avalara</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'Helvetica Neue', sans-serif; background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 100%); color: #f5f5f5; min-height: 100vh; line-height: 1.55; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  /* Header */
+  .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,105,0,0.2); margin-bottom: 24px; }
+  .top-bar .author { font-size: 12px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase; }
+  .top-bar .author strong { color: #FF6900; }
+  .top-bar .badge { background: rgba(255,105,0,0.15); border: 1px solid rgba(255,105,0,0.4); padding: 6px 12px; border-radius: 20px; font-size: 11px; color: #FF8829; letter-spacing: 0.5px; }
+
+  h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 10px; letter-spacing: -0.5px; }
+  h1 .accent { color: #FF6900; }
+  .subtitle { color: #aaa; font-size: 14px; margin-bottom: 24px; max-width: 700px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; }
+  .tab { padding: 12px 18px; background: transparent; border: none; color: #aaa; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab:hover { color: #f5f5f5; }
+  .tab.active { color: #FF6900; border-bottom-color: #FF6900; }
+
+  .panel { display: none; animation: fadein 0.25s ease; }
+  .panel.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Cards */
+  .card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .card h3 { font-size: 16px; margin-bottom: 8px; color: #f5f5f5; }
+  .card .meta { font-size: 11px; color: #FF8829; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+  .card p { color: #ccc; font-size: 13px; line-height: 1.6; }
+
+  /* Portfolio table */
+  .portfolio-table { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+  .portfolio-row { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; gap: 12px; }
+  .portfolio-row:last-child { border-bottom: none; }
+  .portfolio-row.header { background: rgba(255,105,0,0.08); font-size: 11px; color: #FF8829; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
+  .portfolio-row .name { font-size: 13px; font-weight: 500; }
+  .portfolio-row .name small { display: block; color: #888; font-size: 11px; font-weight: 400; margin-top: 2px; }
+  .portfolio-row .score { font-size: 13px; color: #ccc; }
+  .portfolio-row .phase { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
+  .phase-now { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .phase-next { background: rgba(255,105,0,0.15); color: #FF8829; border: 1px solid rgba(255,105,0,0.3); }
+  .phase-later { background: rgba(255,255,255,0.05); color: #888; border: 1px solid rgba(255,255,255,0.1); }
+  .phase-park { background: rgba(220,38,38,0.1); color: #f87171; border: 1px solid rgba(220,38,38,0.2); }
+
+  /* Score bar */
+  .score-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .score-fill { height: 100%; background: linear-gradient(90deg, #FF6900, #FF8829); border-radius: 3px; }
+
+  /* Governance grid */
+  .gov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .gov-item { background: rgba(255,255,255,0.03); border-left: 3px solid #FF6900; padding: 14px 16px; border-radius: 4px; }
+  .gov-item h4 { font-size: 13px; margin-bottom: 4px; color: #f5f5f5; }
+  .gov-item .cadence { font-size: 11px; color: #FF8829; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .gov-item p { font-size: 12px; color: #aaa; line-height: 1.5; }
+
+  /* Metric cards */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .metric-card { background: linear-gradient(135deg, rgba(255,105,0,0.1), rgba(255,105,0,0.02)); border: 1px solid rgba(255,105,0,0.2); border-radius: 8px; padding: 16px; }
+  .metric-card .label { font-size: 11px; color: #FF8829; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .metric-card .value { font-size: 22px; font-weight: 700; color: #f5f5f5; margin-bottom: 4px; }
+  .metric-card .target { font-size: 11px; color: #888; }
+
+  /* 90 day timeline */
+  .timeline { position: relative; padding-left: 30px; }
+  .timeline::before { content: ''; position: absolute; left: 10px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(180deg, #FF6900, rgba(255,105,0,0.2)); }
+  .timeline-item { position: relative; margin-bottom: 18px; }
+  .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; background: #FF6900; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255,105,0,0.2); }
+  .timeline-item h4 { font-size: 14px; color: #f5f5f5; margin-bottom: 4px; }
+  .timeline-item .week { font-size: 11px; color: #FF8829; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .timeline-item p { font-size: 13px; color: #aaa; margin-top: 4px; line-height: 1.55; }
+
+  /* Filter */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ccc; padding: 6px 12px; border-radius: 16px; font-family: inherit; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { border-color: rgba(255,105,0,0.5); color: #FF8829; }
+  .filter-btn.active { background: rgba(255,105,0,0.2); border-color: #FF6900; color: #FF8829; }
+
+  /* Footer */
+  .footer { text-align: center; margin-top: 36px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12px; color: #777; }
+  .footer a { color: #FF6900; text-decoration: none; }
+
+  @media (max-width: 700px) {
+    .portfolio-row { grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
+    .portfolio-row .col-hide { display: none; }
+    .portfolio-row.header { display: none; }
+  }
+
+  .intro-note { background: rgba(255,105,0,0.06); border: 1px solid rgba(255,105,0,0.2); border-radius: 8px; padding: 14px 16px; margin-bottom: 24px; font-size: 13px; color: #ccc; line-height: 1.6; }
+  .intro-note strong { color: #FF8829; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="top-bar">
+    <div class="author">By <strong>Helena Cohee</strong> · For the Lead, P&amp;C AI &amp; Excellence role</div>
+    <div class="badge">INTERACTIVE PROTOTYPE</div>
+  </div>
+
+  <h1>The P&amp;C AI Portfolio <span class="accent">Operating Framework</span></h1>
+  <p class="subtitle">A live walkthrough of how I'd structure, govern, and measure Avalara's People &amp; Culture AI portfolio in the first 90 days. Click through the tabs to see each layer.</p>
+
+  <div class="intro-note">
+    <strong>Why this prototype:</strong> The JD asks for someone who can translate ambiguous AI ideas into a sequenced, governed portfolio with measurable outcomes. Rather than describe how I'd do that, I built a working version. Each tab below is what I'd actually publish in the first 30 to 60 days.
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('portfolio', this)">1. Portfolio</button>
+    <button class="tab" onclick="showTab('governance', this)">2. Governance</button>
+    <button class="tab" onclick="showTab('metrics', this)">3. Metrics</button>
+    <button class="tab" onclick="showTab('plan', this)">4. 90-Day Plan</button>
+  </div>
+
+  <!-- TAB 1: PORTFOLIO -->
+  <div id="portfolio" class="panel active">
+    <div class="card">
+      <div class="meta">PRIORITIZATION LENS</div>
+      <h3>Score every initiative on four dimensions</h3>
+      <p>Business value, risk, feasibility, employee experience. Sequenced into Now / Next / Later / Parked phases. The point isn't to do more; it's to do the right things in the right order, with engineering capacity respected.</p>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterPhase('all', this)">All</button>
+      <button class="filter-btn" onclick="filterPhase('now', this)">Now</button>
+      <button class="filter-btn" onclick="filterPhase('next', this)">Next</button>
+      <button class="filter-btn" onclick="filterPhase('later', this)">Later</button>
+      <button class="filter-btn" onclick="filterPhase('park', this)">Parked</button>
+    </div>
+
+    <div class="portfolio-table">
+      <div class="portfolio-row header">
+        <div>Initiative</div>
+        <div class="col-hide">Value</div>
+        <div class="col-hide">Risk</div>
+        <div class="col-hide">Feasibility</div>
+        <div>Phase</div>
+      </div>
+
+      <div class="portfolio-row" data-phase="now">
+        <div class="name">Primary Agent for Manager FAQs<small>Reduce ticket volume on policy &amp; process Qs</small></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:90%"></div></div></div>
+        <div class="col-hide score">Low<div class="score-bar"><div class="score-fill" style="width:25%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:85%"></div></div></div>
+        <div><span class="phase phase-now">Now</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="now">
+        <div class="name">AI-Augmented Onboarding Journey<small>Personalized day 1-30 orchestration</small></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:85%"></div></div></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:50%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:80%"></div></div></div>
+        <div><span class="phase phase-now">Now</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="next">
+        <div class="name">Performance Feedback Co-Pilot<small>Manager-facing draft assist for review cycles</small></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:80%"></div></div></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:55%"></div></div></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:65%"></div></div></div>
+        <div><span class="phase phase-next">Next</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="next">
+        <div class="name">Goal-Setting Workflow Sub-Agent<small>OKR / SMART goal drafting and quality scoring</small></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:65%"></div></div></div>
+        <div class="col-hide score">Low<div class="score-bar"><div class="score-fill" style="width:30%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:80%"></div></div></div>
+        <div><span class="phase phase-next">Next</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="later">
+        <div class="name">Engagement Insight Synthesis<small>Pulse survey themes + recommended actions</small></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:75%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:75%"></div></div></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:55%"></div></div></div>
+        <div><span class="phase phase-later">Later</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="later">
+        <div class="name">Exit Interview Pattern Detection<small>Trend surfacing across departures</small></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:60%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:70%"></div></div></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:55%"></div></div></div>
+        <div><span class="phase phase-later">Later</span></div>
+      </div>
+
+      <div class="portfolio-row" data-phase="park">
+        <div class="name">AI-Driven Promotion Recommendations<small>Algorithmic surfacing of promotion candidates</small></div>
+        <div class="col-hide score">Med<div class="score-bar"><div class="score-fill" style="width:55%"></div></div></div>
+        <div class="col-hide score">High<div class="score-bar"><div class="score-fill" style="width:95%"></div></div></div>
+        <div class="col-hide score">Low<div class="score-bar"><div class="score-fill" style="width:30%"></div></div></div>
+        <div><span class="phase phase-park">Parked</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="meta">WHY PARK SOMETHING</div>
+      <h3>Saying no is part of the job</h3>
+      <p>AI-driven promotion recommendations are a textbook example of high-risk, low-feasibility work. Bias risk on employment decisions is severe, regulatory exposure is real, and the data infrastructure isn't there yet. Parking it now isn't avoiding the work; it's sequencing it past higher-leverage wins that build trust in the agent first.</p>
+    </div>
+  </div>
+
+  <!-- TAB 2: GOVERNANCE -->
+  <div id="governance" class="panel">
+    <div class="card">
+      <div class="meta">PHILOSOPHY</div>
+      <h3>Lightweight, not heavyweight</h3>
+      <p>Governance should accelerate AI work, not slow it. The right cadence makes risk visible early, keeps stakeholders aligned, and prevents the kind of late-stage surprises that erode trust. Built as a partnership with the central AI/Agentic COE, Legal, Security, and PeopleTech.</p>
+    </div>
+
+    <div class="gov-grid">
+      <div class="gov-item">
+        <div class="cadence">Weekly · 30 min</div>
+        <h4>Portfolio Sync</h4>
+        <p>P&amp;C AI program team. Status on active initiatives, blockers, decisions needed.</p>
+      </div>
+      <div class="gov-item">
+        <div class="cadence">Bi-weekly · 60 min</div>
+        <h4>Risk &amp; Compliance Review</h4>
+        <p>Legal + Security + PeopleTech. New use cases, data access patterns, content review.</p>
+      </div>
+      <div class="gov-item">
+        <div class="cadence">Monthly · 60 min</div>
+        <h4>Portfolio Steering</h4>
+        <p>P&amp;C leadership + AI/Agentic COE. Sequencing, sunset decisions, capacity reconciliation.</p>
+      </div>
+      <div class="gov-item">
+        <div class="cadence">Quarterly · 90 min</div>
+        <h4>Roadmap Refresh</h4>
+        <p>Full P&amp;C function. Outcomes review, strategic re-prioritization, investment asks.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="meta">DECISION FRAMEWORK</div>
+      <h3>Four-question gate before any AI use case ships</h3>
+      <p><strong>1. What's the human-in-the-loop pattern?</strong> No employment decisions without human review.<br>
+      <strong>2. What data does it touch, and at what access level?</strong> Read-only by default; write access requires explicit governance approval.<br>
+      <strong>3. What happens when it gets it wrong?</strong> Defined fallback paths, escalation logic, and content review cycles.<br>
+      <strong>4. What's the sunset trigger?</strong> If it's not delivering measured value within 90 days, what's the off-ramp?</p>
+    </div>
+  </div>
+
+  <!-- TAB 3: METRICS -->
+  <div id="metrics" class="panel">
+    <div class="card">
+      <div class="meta">PRINCIPLE</div>
+      <h3>Outcome metrics first, then activity metrics</h3>
+      <p>Activity metrics (number of pilots, agents deployed) are easy to game and tell you nothing. Outcome metrics (deflection rate, behavior change, time saved) are what makes the AI story match the success metrics. Tracked weekly, reviewed monthly, presented quarterly.</p>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="label">Primary Agent</div>
+        <div class="value">Ticket Deflection</div>
+        <div class="target">Target: 40%+ on policy/process Qs by Q4</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Primary Agent</div>
+        <div class="value">CSAT</div>
+        <div class="target">Target: 4.2/5 average across interactions</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Primary Agent</div>
+        <div class="value">Accuracy</div>
+        <div class="target">Target: 92%+ correct responses on tested intents</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Workflows</div>
+        <div class="value">Time Saved</div>
+        <div class="target">Hours reclaimed per role per quarter</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Manager Behavior</div>
+        <div class="value">Feedback Quality</div>
+        <div class="target">Quality score on review submissions, pre/post AI co-pilot</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Content Quality</div>
+        <div class="value">Review Pass Rate</div>
+        <div class="target">% of agent responses passing content review on sample audit</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Adoption</div>
+        <div class="value">Active Use Rate</div>
+        <div class="target">% of eligible managers/employees using monthly</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Risk</div>
+        <div class="value">Escalation Rate</div>
+        <div class="target">% of interactions requiring human escalation</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="meta">REPORTING CADENCE</div>
+      <h3>Different stakeholders, different views</h3>
+      <p><strong>Weekly internal:</strong> Activity + leading indicators for the program team.<br>
+      <strong>Monthly to P&amp;C leadership:</strong> Outcome metrics + portfolio decisions made.<br>
+      <strong>Quarterly to executive leadership:</strong> Business impact, sequenced wins, investment asks.<br>
+      <strong>Annual:</strong> Full portfolio review, sunset decisions, next-year roadmap.</p>
+    </div>
+  </div>
+
+  <!-- TAB 4: 90-DAY PLAN -->
+  <div id="plan" class="panel">
+    <div class="card">
+      <div class="meta">PHILOSOPHY</div>
+      <h3>Listen first. Ship one thing. Build the system.</h3>
+      <p>The temptation in a new role is to demonstrate value through volume. The actual job is to demonstrate judgment through sequencing. By day 90, the goal is one shipped initiative as proof, the operating system stood up, and the portfolio roadmap published.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="week">Weeks 1-2</div>
+        <h4>Embed and Listen</h4>
+        <p>1:1s with Sr. Director People Operations, P&amp;C function leads, PeopleTech/Engineering, Legal/Security, AI/Agentic COE. Map active P&amp;C AI surface area: primary agent capabilities, in-flight work, content libraries.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Weeks 3-4</div>
+        <h4>Audit and Score</h4>
+        <p>Inventory existing and proposed use cases. Score on the four-dimension framework. Draft v1 of the portfolio roadmap. Identify the one initiative that's both high-leverage and shippable inside 90 days.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Weeks 5-6</div>
+        <h4>Publish and Align</h4>
+        <p>Share v1 portfolio roadmap with P&amp;C leadership. Stand up the governance cadences. Start the bi-weekly Risk &amp; Compliance review. Lock the priority initiative for proof-of-pattern execution.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Weeks 7-10</div>
+        <h4>Ship the Proof</h4>
+        <p>Execute the priority initiative end-to-end with the team. Run the pilot, measure outcomes against the metrics framework, iterate. Document the operating model so the pattern is repeatable.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="week">Weeks 11-13</div>
+        <h4>Scale and Plan</h4>
+        <p>Present 12-month portfolio plan to P&amp;C leadership and AI/Agentic COE. Publish results from proof-of-pattern initiative. Sequence next two priority initiatives. Establish quarterly executive readout cadence.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="meta">WHAT THIS ENABLES</div>
+      <h3>By day 90, the portfolio is legible</h3>
+      <p>P&amp;C leadership knows what's coming, what's parked, and why. PeopleTech knows what's on their roadmap. The AI/Agentic COE has a clear partner. One shipped initiative has built credibility. The metrics framework makes future decisions easier. And the operating model means this work continues even when I'm not in the room.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    Helena Cohee · 323-561-1532 · helenacohee@gmail.com · <a href="https://helenacohee.github.io/portfolio/">helenacohee.github.io/portfolio</a>
+  </div>
+
+</div>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function filterPhase(phase, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.portfolio-row[data-phase]').forEach(row => {
+      row.style.display = (phase === 'all' || row.dataset.phase === phase) ? '' : 'none';
+    });
+  }
+</script>
+
+</body>
+</html>
