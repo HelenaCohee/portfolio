@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helena Cohee — AI in Practice</title>
+<meta name="description" content="How Helena Cohee operates with AI — not just how she uses it. Operating principles, tool stack, and outcomes.">
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #141414;
+    --bg-card: #1f1f1f;
+    --bg-card-hover: #2a2a2a;
+    --text: #ffffff;
+    --text-secondary: #b3b3b3;
+    --text-muted: #757575;
+    --accent: #00d9b8;
+    --accent-secondary: #4a9eff;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-bright: rgba(255, 255, 255, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 4%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s ease;
+  }
+  nav.scrolled { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px); }
+  nav .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); text-decoration: none; }
+  nav .nav-links { display: flex; gap: 28px; align-items: center; }
+  nav .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s ease; }
+  nav .nav-links a:hover { color: var(--text); }
+  nav .nav-links a.active { color: var(--accent); }
+  nav .nav-cta { background: var(--accent); color: var(--bg); padding: 8px 18px; border-radius: 4px; font-weight: 600; transition: background 0.2s ease; }
+  nav .nav-cta:hover { background: #00bfa3; }
+
+  .hero {
+    min-height: 70vh;
+    padding: 140px 4% 60px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at top right, rgba(0, 217, 184, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom left, rgba(74, 158, 255, 0.08) 0%, transparent 50%),
+                var(--bg);
+  }
+  .hero-content { max-width: 1000px; z-index: 2; }
+  .hero-badge { display: inline-block; padding: 6px 14px; background: rgba(0, 217, 184, 0.1); border: 1px solid rgba(0, 217, 184, 0.3); color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 100px; margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(40px, 7vw, 80px); font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px; }
+  .hero h1 .accent { color: var(--accent); }
+  .hero p { font-size: clamp(18px, 2vw, 22px); color: var(--text-secondary); max-width: 720px; line-height: 1.55; }
+
+  .section { padding: 80px 4%; }
+  .section-eyebrow { color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+  .section-title { font-size: clamp(32px, 5vw, 48px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+  .section-subtitle { font-size: 18px; color: var(--text-secondary); max-width: 720px; margin-bottom: 48px; line-height: 1.6; }
+
+  .stack { background: var(--bg-elevated); }
+  .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 32px; }
+  .tool-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; transition: all 0.2s ease; }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .tool-icon { width: 44px; height: 44px; border-radius: 8px; background: rgba(0, 217, 184, 0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 16px; }
+  .tool-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .tool-tier { font-size: 11px; color: var(--accent); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+  .tool-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  .principles-section { padding: 80px 4%; }
+  .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 32px; }
+  .principle-card { background: var(--bg-card); border-radius: 8px; padding: 28px; border-left: 3px solid var(--accent); transition: all 0.2s ease; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .principle-card:hover { transform: translateY(-2px); border-color: var(--border-bright); border-left-color: var(--accent); }
+  .principle-num { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--accent); margin-bottom: 10px; }
+  .principle-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text); letter-spacing: -0.3px; }
+  .principle-body { font-size: 14px; color: var(--text-secondary); line-height: 1.65; }
+
+  .impact-section { background: var(--bg-elevated); padding: 80px 4%; }
+  .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px; margin-top: 32px; }
+  .impact-item { padding: 24px 0; border-top: 2px solid var(--accent); }
+  .impact-number { font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1; margin-bottom: 12px; }
+  .impact-label { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+  .narrative { padding: 80px 4%; max-width: 880px; margin: 0 auto; }
+  .narrative p { font-size: 18px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 24px; }
+  .narrative p strong { color: var(--text); font-weight: 600; }
+  .narrative .pullquote { font-size: 24px; line-height: 1.5; color: var(--text); font-weight: 700; padding: 32px 0 32px 32px; border-left: 3px solid var(--accent); margin: 32px 0; letter-spacing: -0.5px; }
+
+  .cta-section { padding: 100px 4%; text-align: center; background: radial-gradient(circle at center, rgba(0, 217, 184, 0.08), transparent 60%); }
+  .cta-section h2 { font-size: clamp(32px, 5vw, 48px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 20px; }
+  .cta-section p { font-size: 18px; color: var(--text-secondary); margin-bottom: 36px; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary { background: var(--text); color: var(--bg); padding: 14px 32px; border-radius: 4px; font-weight: 600; font-size: 16px; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text); padding: 14px 32px; border-radius: 4px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1px solid var(--border-bright); transition: all 0.2s ease; }
+  .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); }
+
+  footer { padding: 48px 4% 32px; border-top: 1px solid var(--border); background: var(--bg); }
+  .footer-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; transition: color 0.2s ease; }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-copy { color: var(--text-muted); font-size: 13px; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 4%; }
+    nav .nav-links { gap: 16px; }
+    nav .nav-links a:not(.nav-cta) { display: none; }
+    .hero { min-height: 60vh; padding: 100px 4% 40px; }
+    .narrative .pullquote { font-size: 20px; padding-left: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html" class="logo">Helena Cohee</a>
+  <div class="nav-links">
+    <a href="index.html#work">Work</a>
+    <a href="ai-in-practice.html" class="active">AI in Practice</a>
+    <a href="index.html#about">About</a>
+    <a href="https://linkedin.com/in/helenabcohee" target="_blank">LinkedIn</a>
+    <a href="https://github.com/HelenaCohee" target="_blank">GitHub</a>
+    <a href="mailto:helenacohee@gmail.com" class="nav-cta">Contact</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-badge">Operating Model</span>
+    <h1>AI in <span class="accent">Practice.</span></h1>
+    <p>How I operate with AI, not just how I use it. Most People Operations and Talent Management teams treat AI as a productivity gadget. I treat it as an operating layer. The difference shows up in the work.</p>
+  </div>
+</section>
+
+<section class="section stack">
+  <div class="section-eyebrow">Operating Stack</div>
+  <h2 class="section-title">The right tool for the right job.</h2>
+  <p class="section-subtitle">I run a multi-tool AI workflow because each tool has a distinct role. Knowing which tool to reach for is its own kind of fluency.</p>
+  <div class="stack-grid">
+
+    <div class="tool-card">
+      <div class="tool-icon">C</div>
+      <div class="tool-name">Claude</div>
+      <div class="tool-tier">Primary &middot; Daily</div>
+      <div class="tool-desc">Synthesis, executive-level communications, problem structuring, rapid prototyping. Where my reusable prompt playbooks live.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">G</div>
+      <div class="tool-name">ChatGPT</div>
+      <div class="tool-tier">Cross-Model</div>
+      <div class="tool-desc">Cross-model comparison. When stakes are high, I run the same prompt across models and triangulate. Different models have different blind spots.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">M</div>
+      <div class="tool-name">Manus</div>
+      <div class="tool-tier">Build Layer</div>
+      <div class="tool-desc">Coding and document template generation. Used to scaffold the technical infrastructure I've shipped, including production code and document systems.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-icon">A</div>
+      <div class="tool-name">Magnus AI</div>
+      <div class="tool-tier">Synthesis</div>
+      <div class="tool-desc">Meeting transcription and synthesis. Captures verbatim, generates structured summaries, surfaces action items I'd otherwise have to extract manually.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="principles-section">
+  <div class="section-eyebrow">Operating Principles</div>
+  <h2 class="section-title">The four principles I run on.</h2>
+  <p class="section-subtitle">Two years of daily Claude use embedded in real People Ops work taught me these. They're not opinions, they're the patterns that consistently produce good output.</p>
+  <div class="principles-grid">
+
+    <div class="principle-card">
+      <div class="principle-num">PRINCIPLE 01</div>
+      <div class="principle-title">Structure beats cleverness.</div>
+      <div class="principle-body">A boring, well-structured prompt that names role, context, constraints, and desired output beats a clever one-liner every time. The model is doing what you tell it to do, even when you didn't realize you told it.</div>
+    </div>
+
+    <div class="principle-card">
+      <div class="principle-num">PRINCIPLE 02</div>
+      <div class="principle-title">Iterate the prompt, not the output.</div>
+      <div class="principle-body">If the response is wrong twice in a row, the prompt is wrong, not the model. Fix the prompt. Don't keep regenerating.</div>
+    </div>
+
+    <div class="principle-card">
+      <div class="principle-num">PRINCIPLE 03</div>
+      <div class="principle-title">AI structures decisions, humans make them.</div>
+      <div class="principle-body">I never let Claude finalize anything that goes to leadership. Validation against ground truth happens before any output reaches an executive. Trust takes years to build and seconds to lose.</div>
+    </div>
+
+    <div class="principle-card">
+      <div class="principle-num">PRINCIPLE 04</div>
+      <div class="principle-title">Systematize the routine, protect the judgment.</div>
+      <div class="principle-body">Anything I do more than three times in a quarter gets a prompt playbook. Anything that requires real judgment stays in my head. The machine handles the volume so I have capacity for the work that actually matters.</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="impact-section">
+  <div class="section-eyebrow">What This Has Made Possible</div>
+  <h2 class="section-title">The cumulative effect.</h2>
+  <p class="section-subtitle">Two years of operating this way at Netflix. Real metrics from real work.</p>
+  <div class="impact-grid">
+    <div class="impact-item"><div class="impact-number">30%</div><div class="impact-label">Reduction in manual operational effort across enablement workflows</div></div>
+    <div class="impact-item"><div class="impact-number">60 hrs</div><div class="impact-label">Quarterly reporting eliminated through dashboard automation paired with Claude synthesis</div></div>
+    <div class="impact-item"><div class="impact-number">89%</div><div class="impact-label">Activation rate on AI-augmented manager development programs</div></div>
+    <div class="impact-item"><div class="impact-number">4.6/5</div><div class="impact-label">Satisfaction score with measurable behavior change at 90 days post-program</div></div>
+  </div>
+</section>
+
+<section class="narrative">
+  <div class="section-eyebrow">The Bigger Picture</div>
+  <h2 class="section-title">Where the time freed up went.</h2>
+  <p>The cumulative effect of operating this way for two years at Netflix is measurable, but the metrics don't tell the whole story.</p>
+  <p>I built <strong>a library of reusable prompt playbooks</strong> that other team members can adopt to scale their own work. I shipped <strong>AI-augmented learning loops</strong> built into manager development programs. I designed <strong>scenario-based practice partners</strong> that let managers rehearse difficult conversations before they have them in real life.</p>
+  <div class="pullquote">
+    Most importantly, the time freed up went somewhere. It went into the strategic work that has always mattered most and that AI cannot do.
+  </div>
+  <p>The pattern recognition across organizations. The judgment calls about what to surface to leadership. The relationship work that builds trust. AI didn't replace any of that. It made room for more of it.</p>
+  <p>The next decade of People Operations work will be defined by people who can make AI an operating layer for their function, not a feature in their toolkit. The skill that matters isn't prompting, it's <strong>translating real operational problems into structured prompts and architecting workflows that scale beyond any single person.</strong></p>
+  <p>That's the work I want to keep doing. The artifacts on this site, the playbooks I share, and the systems I've built reflect that bet.</p>
+</section>
+
+<section class="cta-section">
+  <h2>Want to talk about <span style="color: var(--accent);">building together?</span></h2>
+  <p>Open to Senior Program Manager, AI Enablement, Learning &amp; Development, People Operations, Talent Management, and Executive Business Partner roles. Full-time, contract, or fractional. Fully remote.</p>
+  <div class="cta-row">
+    <a href="mailto:helenacohee@gmail.com" class="btn-primary">Get in touch →</a>
+    <a href="index.html" class="btn-secondary">Back to portfolio</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-copy">© 2026 Helena Cohee. Built with purpose.</div>
+    <div class="footer-links">
+      <a href="index.html">Portfolio</a>
+      <a href="https://linkedin.com/in/helenabcohee" target="_blank">LinkedIn</a>
+      <a href="https://github.com/HelenaCohee" target="_blank">GitHub</a>
+      <a href="mailto:helenacohee@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', function() {
+    var nav = document.getElementById('nav');
+    if (window.scrollY > 50) { nav.classList.add('scrolled'); } else { nav.classList.remove('scrolled'); }
+  });
+</script>
+
+</body>
+</html>
