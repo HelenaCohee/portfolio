@@ -1,21 +1,86 @@
-PEOPLE TEAM · AI AGENTS
-Building AI agents for the people team
-Two working demos of the same idea, at two levels of complexity. Both solve a real people-team problem, new hire onboarding, and both follow the same architecture I use for any agent.
-1 · TRIGGER
-What kicks it off: a question, a goal, an event.
-2 · GROUNDING
-Answers only from a trusted source, never guesses.
-3 · ACTION
-Answers, opens a ticket, books a calendar hold.
-4 · HANDOFF
-Routes anything sensitive to a human.
-Onboarding Assistant
-BASIC
-A grounded Q&A agent. Answers new-hire questions only from policy, cites the section it used, and routes sensitive topics to a human. One question in, one trusted answer out.
-Open the demo →
-Onboarding Orchestrator
-ADVANCED
-An autonomous multi-step agent. Give it a goal and it plans the steps, calls multiple tools in sequence, shows its reasoning, and assembles a final result, while escalating anything sensitive to a human.
-Open the demo →
-The idea: the same skeleton works across the whole employee lifecycle, onboarding, benefits questions, manager enablement, internal mobility, and across any internal function that fields repetitive questions. Build the pattern once, prove the trust and adoption model, then template it. Agents take the repetitive load so people stay on judgment.
-Built by Helena Cohee · portfolio
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>People Team AI Agents — Helena Cohee</title>
+<style>
+  :root {
+    --bg: #0a0e1a; --panel: #0e1626; --line: #21304d; --line2: #243353;
+    --text: #e8edf6; --muted: #8aa0c4; --blue: #2f6df0; --green: #3ddc97; --amber: #ffcf6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: radial-gradient(1000px 500px at 70% -10%, #1b2a4a 0%, #0a0e1a 55%);
+    color: var(--text); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh; padding: 48px 16px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .eyebrow { font-size: 12px; letter-spacing: 2px; color: var(--green); font-weight: 700; text-transform: uppercase; }
+  h1 { font-size: 34px; line-height: 1.15; margin: 10px 0 14px; letter-spacing: -.5px; }
+  .lede { font-size: 16px; line-height: 1.6; color: #c4d2ec; max-width: 600px; }
+  .skeleton { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 32px 0; }
+  .sk { background: #101b30; border: 1px solid var(--line2); border-radius: 10px; padding: 13px; }
+  .sk .n { font-size: 11px; font-weight: 800; color: #7fb4ff; letter-spacing: .5px; }
+  .sk .d { font-size: 12px; color: #b6c6e6; line-height: 1.45; margin-top: 5px; }
+  .cards { display: flex; flex-direction: column; gap: 16px; margin: 32px 0; }
+  .demo { display: block; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px; transition: border-color .2s, transform .2s; }
+  .demo:hover { border-color: var(--blue); transform: translateY(-2px); }
+  .demo .row { display: flex; align-items: center; gap: 12px; }
+  .demo .badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; border-radius: 999px; padding: 4px 10px; }
+  .badge.basic { color: #9fb4d6; border: 1px solid #2b3c5e; }
+  .badge.adv { color: var(--amber); border: 1px solid #5a4a1f; background: rgba(255,207,107,.08); }
+  .demo h3 { font-size: 19px; margin: 0; }
+  .demo p { font-size: 14px; color: var(--muted); line-height: 1.55; margin: 10px 0 0; }
+  .demo .go { font-size: 13px; color: var(--green); font-weight: 700; margin-top: 12px; }
+  .note { font-size: 13px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 20px; margin-top: 8px; }
+  .note strong { color: var(--text); }
+  .sig { margin-top: 28px; font-size: 14px; color: #c4d2ec; }
+  .sig a { color: var(--green); }
+  @media (max-width: 560px) { .skeleton { grid-template-columns: repeat(2, 1fr); } h1 { font-size: 27px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">People Team · AI Agents</div>
+    <h1>Building AI agents for the people team</h1>
+    <p class="lede">
+      Two working demos of the same idea, at two levels of complexity. Both solve a real people-team
+      problem, new hire onboarding, and both follow the same architecture I use for any agent.
+    </p>
+    <div class="skeleton">
+      <div class="sk"><div class="n">1 · TRIGGER</div><div class="d">What kicks it off: a question, a goal, an event.</div></div>
+      <div class="sk"><div class="n">2 · GROUNDING</div><div class="d">Answers only from a trusted source, never guesses.</div></div>
+      <div class="sk"><div class="n">3 · ACTION</div><div class="d">Answers, opens a ticket, books a calendar hold.</div></div>
+      <div class="sk"><div class="n">4 · HANDOFF</div><div class="d">Routes anything sensitive to a human.</div></div>
+    </div>
+    <div class="cards">
+      <a class="demo" href="onboarding-agent-basic.html">
+        <div class="row">
+          <h3>Onboarding Assistant</h3>
+          <span class="badge basic" style="margin-left:auto">BASIC</span>
+        </div>
+        <p>A grounded Q&amp;A agent. Answers new-hire questions only from policy, cites the section it used, and routes sensitive topics to a human. One question in, one trusted answer out.</p>
+        <div class="go">Open the demo →</div>
+      </a>
+      <a class="demo" href="onboarding-agent-advanced.html">
+        <div class="row">
+          <h3>Onboarding Orchestrator</h3>
+          <span class="badge adv" style="margin-left:auto">ADVANCED</span>
+        </div>
+        <p>An autonomous multi-step agent. Give it a goal and it plans the steps, calls multiple tools in sequence, shows its reasoning, and assembles a final result, while escalating anything sensitive to a human.</p>
+        <div class="go">Open the demo →</div>
+      </a>
+    </div>
+    <div class="note">
+      <strong>The idea:</strong> the same skeleton works across the whole employee lifecycle, onboarding,
+      benefits questions, manager enablement, internal mobility, and across any internal function that
+      fields repetitive questions. Build the pattern once, prove the trust and adoption model, then
+      template it. Agents take the repetitive load so people stay on judgment.
+    </div>
+    <div class="sig">
+      Built by Helena Cohee · <a href="https://helenacohee.github.io/portfolio/">portfolio</a>
+    </div>
+  </div>
+</body>
+</html>
