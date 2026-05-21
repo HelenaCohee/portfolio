@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Onboarding Orchestrator — Advanced Agent Demo</title>
+<style>
+  :root {
+    --bg: #0a0e1a; --panel: #0a1120; --line: #1d2a45; --line2: #243353;
+    --text: #e8edf6; --muted: #8aa0c4; --blue: #2f6df0; --green: #3ddc97; --amber: #ffcf6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: linear-gradient(160deg,#0a0e1a 0%,#10182b 100%);
+    color: var(--text); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh; padding: 28px 16px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  .head { display: flex; align-items: center; margin-bottom: 18px; }
+  .title { font-size: 22px; font-weight: 800; letter-spacing: -.3px; }
+  .sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .badge {
+    margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: 1.5px;
+    color: var(--amber); border: 1px solid #5a4a1f; background: rgba(255,207,107,.08);
+    border-radius: 999px; padding: 5px 12px;
+  }
+  .scenarios { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+  .scn {
+    text-align: left; font-size: 13px; color: #cdd9ef; background: #131d33;
+    border: 1px solid #26375a; border-radius: 10px; padding: 10px 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .scn:hover { border-color: var(--blue); }
+  .input-row { display: flex; gap: 8px; margin-bottom: 18px; }
+  input {
+    flex: 1; font-size: 14px; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid #2b3c5e; background: var(--bg); color: var(--text); outline: none; font-family: inherit;
+  }
+  .run {
+    font-weight: 800; font-size: 14px; color: #0a0e1a; background: var(--green);
+    border: none; border-radius: 10px; padding: 0 20px; cursor: pointer;
+  }
+  .run:disabled { opacity: .5; cursor: default; }
+  .trace {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; min-height: 280px; max-height: 480px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .empty { color: #5f7197; font-size: 13px; font-style: italic; text-align: center; margin: auto; }
+  .step { display: flex; align-items: flex-start; gap: 10px; animation: fade .3s ease; }
+  .goalChip { font-size: 10px; font-weight: 800; color: var(--blue); border: 1px solid var(--blue); border-radius: 5px; padding: 2px 7px; margin-top: 2px; }
+  .goalText { font-size: 14px; line-height: 1.5; }
+  .thinking { font-size: 13px; color: #7f95ba; font-style: italic; animation: pulse 1.4s infinite; }
+  .planBox { background: #101b30; border: 1px solid var(--line2); border-radius: 10px; padding: 13px; animation: fade .3s ease; }
+  .planLabel { font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #7fb4ff; }
+  .planSummary { font-size: 14px; margin: 6px 0 8px; color: #dce6f7; }
+  ol { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+  .planItem { font-size: 13px; color: #b6c6e6; line-height: 1.5; }
+  .toolBox { background: #0e1830; border: 1px solid var(--line2); border-left: 3px solid var(--green); border-radius: 10px; padding: 12px; animation: fade .3s ease; }
+  .toolBox.esc { border-left-color: var(--amber); }
+  .toolHead { display: flex; align-items: center; gap: 8px; }
+  .toolName { font-size: 13.5px; font-weight: 700; }
+  .escTag { margin-left: auto; font-size: 10px; font-weight: 800; color: var(--amber); letter-spacing: .5px; }
+  .toolWhy { font-size: 12px; color: var(--muted); margin-top: 5px; font-style: italic; }
+  .toolOut { font-size: 13px; color: #cdd9ef; margin-top: 6px; line-height: 1.5; }
+  .final { background: linear-gradient(135deg,#0f2238,#0e1830); border: 1px solid #2b6e4e; border-radius: 12px; padding: 15px; animation: fade .4s ease; }
+  .finalLabel { font-size: 11px; font-weight: 800; letter-spacing: .8px; color: var(--green); margin-bottom: 8px; }
+  .finalMsg { font-size: 14.5px; line-height: 1.6; color: #eaf3ff; }
+  .followup { font-size: 12.5px; color: var(--amber); margin-top: 10px; padding-top: 10px; border-top: 1px solid #1d3a2e; }
+  .caption { font-size: 12.5px; line-height: 1.6; color: var(--muted); text-align: center; margin-top: 16px; }
+  .caption strong { color: var(--text); }
+  @keyframes fade { from {opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  @keyframes pulse { 0%,100%{opacity:.5;} 50%{opacity:1;} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <div class="title">Onboarding Orchestrator</div>
+        <div class="sub">People Team · autonomous multi-step agent</div>
+      </div>
+      <div class="badge">ADVANCED</div>
+    </div>
+
+    <div class="scenarios" id="scenarios"></div>
+
+    <div class="input-row">
+      <input id="input" placeholder="Give the agent a new-hire goal…" />
+      <button class="run" id="run">Run agent</button>
+    </div>
+
+    <div class="trace" id="trace">
+      <div class="empty" id="empty">Pick a scenario or type a goal. Watch the agent plan, call tools, and act.</div>
+    </div>
+
+    <div class="caption">
+      <strong>How it works:</strong> The agent decomposes a goal into steps, selects the right tool for each,
+      executes them in sequence, and synthesizes a final result — while always escalating sensitive items to a
+      human. Plan → tool calls → reasoning trace → action → human handoff.
+    </div>
+  </div>
+
+<script>
+  const TOOLS = {
+    knowledge_base: { label: "Knowledge Base", icon: "📚", out: "Found policy: benefits start day one; payroll bi-weekly; laptop ships before day one; PTO accrues from day one." },
+    it_ticketing:   { label: "IT Ticketing", icon: "🎫", out: "Created IT ticket #4471 to confirm laptop shipment and provision badge access within 24h." },
+    calendar:       { label: "Calendar", icon: "📅", out: "Scheduled a 30-min Day-1 orientation hold and a benefits-enrollment reminder for day 25." },
+    hr_escalation:  { label: "HR Escalation", icon: "🧑‍💼", out: "Routed sensitive item to a human HR partner with context; new hire notified a person will follow up." },
+  };
+
+  // Scenarios with their pre-planned steps (the "agent" decides these)
+  const SCENARIOS = [
+    {
+      goal: "I'm a new hire starting Monday. Help me get set up: benefits, laptop, and my first week.",
+      summary: "Pull the relevant policy, handle equipment logistics, and set up first-week calendar items.",
+      steps: [
+        { tool: "knowledge_base", why: "Confirm benefits, pay, and day-one details from policy." },
+        { tool: "it_ticketing", why: "Make sure the laptop and badge access are ready for day one." },
+        { tool: "calendar", why: "Block orientation and a benefits-enrollment reminder." },
+      ],
+      final: "You're all set for Monday! Your benefits start day one and I've confirmed your laptop and badge access are being prepared. I've also added a Day-1 orientation hold to your calendar and a reminder to enroll in benefits before day 25. Welcome aboard!",
+      followup: false,
+    },
+    {
+      goal: "Set up my onboarding and also, I'll need a medical accommodation my first week.",
+      summary: "Handle standard onboarding logistics, and route the accommodation request to a human, since it's sensitive.",
+      steps: [
+        { tool: "knowledge_base", why: "Confirm standard onboarding details from policy." },
+        { tool: "calendar", why: "Set up first-week orientation and reminders." },
+        { tool: "hr_escalation", why: "Medical accommodation is sensitive — a human HR partner must handle this." },
+      ],
+      final: "I've set up your standard onboarding — orientation is on your calendar and your day-one details are confirmed. For the medical accommodation, I've connected you with a human HR partner who will reach out directly to handle that with the care and privacy it deserves.",
+      followup: true,
+    },
+    {
+      goal: "What do I need to do before day one, and can you handle the logistics for me?",
+      summary: "Surface the pre-start checklist from policy and take care of the logistics automatically.",
+      steps: [
+        { tool: "knowledge_base", why: "Pull the pre-start checklist and policy details." },
+        { tool: "it_ticketing", why: "Trigger equipment and access setup so it's ready." },
+        { tool: "calendar", why: "Add orientation and key reminders to the calendar." },
+      ],
+      final: "Before day one, the main things are reviewing your benefits options and making sure your equipment is set. I've already handled the logistics — your laptop and badge access are in motion, and I've added orientation plus a benefits reminder to your calendar. You're good to go!",
+      followup: false,
+    },
+  ];
+
+  const trace = document.getElementById("trace");
+  const empty = document.getElementById("empty");
+  const runBtn = document.getElementById("run");
+  const input = document.getElementById("input");
+  const scenariosEl = document.getElementById("scenarios");
+
+  let running = false;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  function clearTrace() { trace.innerHTML = ""; }
+  function scrollTrace() { trace.scrollTop = trace.scrollHeight; }
+
+  function addGoal(text) {
+    const d = document.createElement("div");
+    d.className = "step";
+    d.innerHTML = '<div class="goalChip">GOAL</div><div class="goalText">' + text + '</div>';
+    trace.appendChild(d); scrollTrace();
+  }
+  function addThinking(text) {
+    const d = document.createElement("div");
+    d.className = "thinking"; d.textContent = "↻ " + text; d.id = "thinking";
+    trace.appendChild(d); scrollTrace();
+  }
+  function removeThinking() { const t = document.getElementById("thinking"); if (t) t.remove(); }
+  function addPlan(summary, steps) {
+    const d = document.createElement("div");
+    d.className = "planBox";
+    let items = steps.map(s => '<li class="planItem"><strong>' + TOOLS[s.tool].label + '</strong> — ' + s.why + '</li>').join("");
+    d.innerHTML = '<div class="planLabel">PLAN</div><div class="planSummary">' + summary + '</div><ol>' + items + '</ol>';
+    trace.appendChild(d); scrollTrace();
+  }
+  function addTool(step) {
+    const t = TOOLS[step.tool];
+    const esc = step.tool === "hr_escalation";
+    const d = document.createElement("div");
+    d.className = "toolBox" + (esc ? " esc" : "");
+    d.innerHTML = '<div class="toolHead"><span>' + t.icon + '</span><span class="toolName">' + t.label + '</span>' +
+      (esc ? '<span class="escTag">HUMAN HANDOFF</span>' : '') + '</div>' +
+      '<div class="toolWhy">' + step.why + '</div><div class="toolOut">' + t.out + '</div>';
+    trace.appendChild(d); scrollTrace();
+  }
+  function addFinal(msg, followup) {
+    const d = document.createElement("div");
+    d.className = "final";
+    d.innerHTML = '<div class="finalLabel">✓ AGENT COMPLETE — message to new hire</div>' +
+      '<div class="finalMsg">' + msg + '</div>' +
+      (followup ? '<div class="followup">A human HR partner will follow up on the sensitive item.</div>' : '');
+    trace.appendChild(d); scrollTrace();
+  }
+
+  function matchScenario(goal) {
+    const lower = goal.toLowerCase();
+    if (lower.includes("accommodation") || lower.includes("medical") || lower.includes("sensitive"))
+      return SCENARIOS[1];
+    if (lower.includes("before day one") || lower.includes("logistics") || lower.includes("checklist"))
+      return SCENARIOS[2];
+    return SCENARIOS[0];
+  }
+
+  async function run(goal) {
+    if (!goal.trim() || running) return;
+    running = true; runBtn.disabled = true; runBtn.textContent = "Running…";
+    if (empty) empty.style.display = "none";
+    clearTrace();
+
+    const sc = matchScenario(goal);
+
+    addGoal(goal);
+    addThinking("Planning the steps needed to fulfill this request…");
+    await wait(900);
+    removeThinking();
+    addPlan(sc.summary, sc.steps);
+    await wait(600);
+
+    for (const step of sc.steps) {
+      await wait(800);
+      addTool(step);
+    }
+    await wait(600);
+    addThinking("Assembling the final plan for the new hire…");
+    await wait(900);
+    removeThinking();
+    addFinal(sc.final, sc.followup);
+
+    running = false; runBtn.disabled = false; runBtn.textContent = "Run agent";
+  }
+
+  SCENARIOS.forEach(sc => {
+    const b = document.createElement("button");
+    b.className = "scn"; b.textContent = sc.goal;
+    b.onclick = () => run(sc.goal);
+    scenariosEl.appendChild(b);
+  });
+
+  runBtn.onclick = () => run(input.value);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") run(input.value); });
+</script>
+</body>
+</html>
