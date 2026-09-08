@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Systems — Helena Cohee</title>
+<meta name="description" content="AI agents, reusable AI skills, architecture, governance, and evaluation frameworks.">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html"><span class="brand-mark">HC</span><span>Helena Cohee</span></a>
+    <button class="menu-toggle" aria-label="Open navigation">Menu</button>
+    <div class="nav-links">
+      <a href="work.html">Work</a>
+      <a href="ai-systems.html">AI Systems</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="ai-in-practice.html">AI in Practice</a>
+      <a href="about.html">About</a>
+      <a href="shop.html">Shop</a>
+      <a class="nav-cta" href="mailto:helenacohee@gmail.com">Contact</a>
+    </div>
+  </div>
+</nav>
+
+
+<main>
+<section class="page-hero"><div class="container"><div class="breadcrumb"><a href="index.html">Home</a> / AI Systems</div><span class="eyebrow">Agents + Skills + Governance</span><h1>The system behind the <span class="gradient-text">AI work.</span></h1><p>I design modular AI systems: agents orchestrate the work, reusable skills provide specialized capabilities, governance keeps actions bounded, and evaluations measure quality. Public pages show the architecture — not the proprietary implementation.</p></div></section>
+<section class="section"><div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="agents">Agents</button>
+    <button class="tab-btn" data-tab="skills">Skills</button>
+    <button class="tab-btn" data-tab="shortcuts">Shortcuts</button>
+    <button class="tab-btn" data-tab="architecture">Architecture</button>
+    <button class="tab-btn" data-tab="governance">Governance</button>
+    <button class="tab-btn" data-tab="evals">Evals</button>
+  </div>
+
+  <div class="tab-panel active" id="agents">
+    <div class="section-head"><div><div class="section-kicker">Agent portfolio</div><h2 class="section-title">Specialists, not one giant bot.</h2><p class="section-copy">Each agent has a clear job and pulls in reusable skills as needed. The public portfolio describes the capability and outputs; implementation instructions remain private.</p></div></div>
+    <div class="grid-3">
+      <div class="card"><div class="card-icon">SO</div><h3>Strategic Operator</h3><p>Frames ambiguous problems, surfaces constraints, compares options, and turns analysis into decision-ready recommendations.</p><div class="skill-flow">Ambiguity → framing → evidence → tradeoffs → recommendation</div></div>
+      <div class="card"><div class="card-icon">MA</div><h3>Meeting → Action</h3><p>Converts meeting notes into decisions, actions, owners, deadlines, risks, and open questions.</p><div class="skill-flow">Notes → extraction → classification → ownership → review</div></div>
+      <div class="card"><div class="card-icon">EB</div><h3>Executive Brief</h3><p>Compresses complex updates into the signal leaders need: what changed, why it matters, risks, and decisions required.</p><div class="skill-flow">Sources → signal → implications → asks → brief</div></div>
+      <div class="card"><div class="card-icon">PH</div><h3>Project Health</h3><p>Reviews milestones, dependencies, decisions, ownership, and blockers to identify emerging execution risk.</p><div class="skill-flow">Evidence → risk signals → severity → intervention</div></div>
+      <div class="card"><div class="card-icon">PA</div><h3>Process Architect</h3><p>Finds friction, handoffs, bottlenecks, and automation opportunities, then proposes a cleaner operating design.</p><div class="skill-flow">Current state → constraint → redesign → controls → rollout</div></div>
+      <div class="card"><div class="card-icon">ON</div><h3>Onboarding Agent</h3><p>Demonstrates role-aware onboarding guidance, task sequencing, and knowledge delivery for new team members.</p><a class="card-link" href="agents/index.html">View public demos →</a></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="skills">
+    <div class="section-head"><div><div class="section-kicker">Reusable capability layer</div><h2 class="section-title">Show the capability. Protect the recipe.</h2><p class="section-copy">These cards intentionally expose purpose, inputs, and outputs — not the full prompt bodies, routing rules, edge cases, or SKILL.md implementation.</p></div><a class="btn btn-primary" href="shop.html">Get the paid toolkit →</a></div>
+    <div class="grid-3">
+      <div class="card"><div class="skill-meta"><span>Strategic reasoning</span><span>Public preview</span></div><h3>Gut → Data → Gut</h3><p>Starts with a judgment, tests it against evidence and contradictions, then updates the decision rather than outsourcing thinking to the model.</p><div class="skill-flow">Initial judgment → evidence → contradiction test → updated judgment</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Risk</span><span>Public preview</span></div><h3>Risk Radar</h3><p>Surfaces execution risks from project evidence and distinguishes observed risk from speculation.</p><div class="skill-flow">Evidence → signal → severity → impact → response</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Critical thinking</span><span>Public preview</span></div><h3>Blind Spot</h3><p>Challenges the current framing and asks what assumptions, stakeholders, constraints, or second-order effects may be missing.</p><div class="skill-flow">Current view → assumptions → omissions → implications</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Options</span><span>Public preview</span></div><h3>ALT 3</h3><p>Generates three materially different paths instead of cosmetic variations of the same idea.</p><div class="skill-flow">Goal → constraints → 3 distinct strategies → tradeoffs</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Leverage</span><span>Public preview</span></div><h3>X10 Think</h3><p>Looks for structural leverage instead of incremental optimization: remove, automate, standardize, delegate, or redesign.</p><div class="skill-flow">Baseline → constraint → leverage → redesign</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Challenge</span><span>Public preview</span></div><h3>Kill Critic</h3><p>Attempts to invalidate an idea before recommending it, reducing confirmation bias and weak strategy.</p><div class="skill-flow">Proposal → failure modes → disconfirming evidence → verdict</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>PM</span><span>Public preview</span></div><h3>PM Mode</h3><p>Forces a project-manager lens across ownership, sequencing, milestones, dependencies, decisions, and stakeholder alignment.</p><div class="skill-flow">Goal → workstreams → owners → dependencies → cadence</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Executive signal</span><span>Public preview</span></div><h3>Executive Signal</h3><p>Separates important changes, risk, and decisions from informational noise for leadership audiences.</p><div class="skill-flow">Inputs → signal → implication → decision / ask</div><div class="lock-note">🔒 Implementation kept private</div></div>
+      <div class="card"><div class="skill-meta"><span>Library</span><span>100+ patterns</span></div><h3>AI Shortcut Library</h3><p>A broader library of shortcuts and prompt patterns for faster everyday AI work. The complete library lives in the paid product, not this repo.</p><a class="card-link" href="https://payhip.com/b/WHlLm?utm_source=github_portfolio&utm_medium=referral&utm_campaign=ai_shortcut_library" target="_blank" rel="noreferrer">Get the current library →</a></div>
+    </div>
+  </div>
+
+
+  <div class="tab-panel" id="shortcuts">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">Fast command layer</div>
+        <h2 class="section-title">Shortcuts are not the same thing as skills.</h2>
+        <p class="section-copy">Shortcuts are lightweight command patterns for changing how the model approaches a task. Skills are deeper reusable procedures with logic, guardrails, inputs, outputs, and evaluation criteria. I use both — and keep the distinction intentional.</p>
+      </div>
+      <a class="btn btn-primary" href="shop.html">Browse the shortcut library →</a>
+    </div>
+
+    <div class="grid-3">
+      <div class="card"><div class="card-icon">TH</div><h3>Think & Analyze</h3><p>Fast modes for critique, comparison, assumptions, risks, root-cause analysis, fact checking, and alternative viewpoints.</p><div class="skill-flow">Examples: /critic · /compare · /risks · /rootcause · /verify</div></div>
+      <div class="card"><div class="card-icon">PL</div><h3>Plan & Decide</h3><p>Commands for prioritization, decision support, roadmaps, action planning, focus, time allocation, and practical next steps.</p><div class="skill-flow">Examples: /decision · /prioritize · /roadmap · /planner · /action</div></div>
+      <div class="card"><div class="card-icon">WR</div><h3>Write & Communicate</h3><p>Rapid transformations for rewriting, tone, clarity, concision, professional messaging, email, headlines, and social content.</p><div class="skill-flow">Examples: /rewrite · /tone · /concise · /email · /headline</div></div>
+      <div class="card"><div class="card-icon">MK</div><h3>Business & Growth</h3><p>Shortcut modes for offer design, pricing, audience thinking, competitive analysis, market opportunities, content, and funnels.</p><div class="skill-flow">Examples: /pricing · /market · /audience · /competitor · /funnel</div></div>
+      <div class="card"><div class="card-icon">LR</div><h3>Learn & Career</h3><p>Fast modes for teaching, quizzes, study plans, interviews, resumes, mentoring, coaching, and career thinking.</p><div class="skill-flow">Examples: /teacher · /quiz · /interview · /resume · /coach</div></div>
+      <div class="card"><div class="card-icon">ST</div><h3>Structure & Automate</h3><p>Commands for frameworks, matrices, checklists, templates, tables, JSON structures, reverse planning, and automation ideas.</p><div class="skill-flow">Examples: /framework · /matrix · /checklist · /json · /automate</div></div>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <div class="section-kicker">Public / paid boundary</div>
+      <h2>The names can be visible. The implementation stays paid.</h2>
+      <p>The public portfolio shows categories and a few representative commands. The paid library contains the complete command set, original instructions, usage guidance, combinations, and practical examples.</p>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="architecture">
+    <div class="section-head"><div><div class="section-kicker">System design</div><h2 class="section-title">A modular architecture.</h2><p class="section-copy">The goal is reuse and control: agents do not need to duplicate every instruction if they can route to shared skills and common governance.</p></div></div>
+    <div class="arch-flow">
+      <div class="arch-node"><strong>User intent</strong><span>Goal + context</span></div>
+      <div class="arch-node"><strong>Agent</strong><span>Role + boundaries</span></div>
+      <div class="arch-node"><strong>Skill router</strong><span>Select capability</span></div>
+      <div class="arch-node"><strong>Skill registry</strong><span>Reusable logic</span></div>
+      <div class="arch-node"><strong>Tools + context</strong><span>Evidence layer</span></div>
+      <div class="arch-node"><strong>Human review</strong><span>Approval boundary</span></div>
+      <div class="arch-node"><strong>Evaluation</strong><span>Quality + risk</span></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="governance">
+    <div class="section-head"><div><div class="section-kicker">Responsible execution</div><h2 class="section-title">AI proposes. Humans stay accountable.</h2></div></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-icon">H</div><h3>Human-in-the-loop</h3><p>High-impact actions require human review before anything is sent, assigned, published, or changed.</p></div>
+      <div class="card"><div class="card-icon">E</div><h3>Evidence before confidence</h3><p>Recommendations distinguish sourced evidence, inference, and uncertainty instead of presenting everything as fact.</p></div>
+      <div class="card"><div class="card-icon">D</div><h3>Data minimization</h3><p>Workflows are designed to use only the information required for the task and avoid exposing sensitive internal data.</p></div>
+      <div class="card"><div class="card-icon">B</div><h3>Bounded actions</h3><p>Agents have explicit operating boundaries, escalation paths, and stop conditions rather than unlimited autonomy.</p></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="evals">
+    <div class="section-head"><div><div class="section-kicker">Evaluation</div><h2 class="section-title">If you cannot measure it, you cannot improve it.</h2><p class="section-copy">I evaluate agent outputs against dimensions that matter to actual work, not just whether the answer “sounds good.”</p></div></div>
+    <div class="grid-3">
+      <div class="card"><h3>Accuracy</h3><p>Are claims correct and supported by the available evidence?</p></div>
+      <div class="card"><h3>Completeness</h3><p>Were important decisions, risks, actions, or constraints missed?</p></div>
+      <div class="card"><h3>Grounding</h3><p>Can important claims be traced back to a source or explicit input?</p></div>
+      <div class="card"><h3>Actionability</h3><p>Can a person use the output to make a decision or take the next step?</p></div>
+      <div class="card"><h3>Relevance</h3><p>Does the output stay focused on the actual job to be done?</p></div>
+      <div class="card"><h3>Risk & confidence</h3><p>Are uncertainty, sensitive actions, and possible failure modes represented honestly?</p></div>
+    </div>
+  </div>
+</div></section>
+</main>
+
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <small>© <span data-year></span> Helena Cohee. AI systems, operations, and program leadership.</small>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/helenabcohee" target="_blank" rel="noreferrer">LinkedIn</a>
+      <a href="https://github.com/HelenaCohee" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="mailto:helenacohee@gmail.com">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+<script src="analytics.js"></script>
+</body>
+</html>
